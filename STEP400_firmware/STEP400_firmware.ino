@@ -17,7 +17,7 @@
 
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
-constexpr auto FIRMWARE_NAME = "STEP400proto_r4";
+constexpr auto FIRMWARE_NAME = "STEP400_r1.0.0";
 boolean debugMode = false;
 
 // Json configuration file
@@ -157,6 +157,7 @@ uint32_t RXL_blinkStartTime, TXL_blinkStartTime;
 #define RXL_TXL_BLINK_DURATION	30 // ms
 
 void setup() {
+
     //setUSBPriority();
     pinMode(ledPin, OUTPUT);
     pinMode(SD_CS_PIN, OUTPUT);
@@ -516,7 +517,7 @@ void loop() {
     uint32_t 
         currentTimeMillis = millis(),
         currentTimeMicros = micros();
-    static uint32_t lastPollTime = 0;
+    static uint32_t lastPollTime = 0, oledUpdateTime = 0;
 
     if ((uint32_t)(currentTimeMillis - lastPollTime) >= STATUS_POLL_PERIOD)
     {
@@ -531,6 +532,7 @@ void loop() {
         Watchdog.reset();
         lastPollTime = currentTimeMillis;
     }
+
     if (SerialUSB.available() > 0)
     {
         diagnosis(SerialUSB.read());

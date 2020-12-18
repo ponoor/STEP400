@@ -125,6 +125,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getDecayModeParam", getDecayModeParam);
             bMsgRouted |= msgIN.route("/setDebugMode", setDebugMode);
             bMsgRouted |= msgIN.route("/getAdcVal", getAdcVal);
+            bMsgRouted |= msgIN.route("/setBrakeOut", setBrakeOut);
             turnOnRXL();
             //digitalWrite(ledPin, bMsgRouted);
             if (!bMsgRouted) {
@@ -209,6 +210,13 @@ void getAdcVal(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = msg.getInt(0);
     if (MOTOR_ID_FIRST <= motorID && motorID <= MOTOR_ID_LAST) {
         sendTwoInt("/adcVal", motorID, stepper[motorID - MOTOR_ID_FIRST].getParam(ADC_OUT));
+    }
+}
+
+void setBrakeOut(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = msg.getInt(0);
+    if (MOTOR_ID_FIRST <= motorID && motorID <= MOTOR_ID_LAST) {
+        digitalWrite(brakePin[motorID - MOTOR_ID_FIRST], (msg.getInt(1) > 0));
     }
 }
 

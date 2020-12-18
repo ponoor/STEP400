@@ -1,6 +1,9 @@
 void loadConfig() {
     uint8_t i;
-    sdInitializeSucceeded = SD.begin(SD_CS_PIN);
+    if (digitalRead(SD_DETECT_PIN) == LOW)
+    {
+        sdInitializeSucceeded = SD.begin(SD_CS_PIN);
+    }
 
     File file = SD.open(filename);
     configFileOpenSucceeded = (file != false);
