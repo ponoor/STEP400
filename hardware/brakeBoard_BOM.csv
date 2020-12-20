@@ -1,0 +1,10 @@
+#,Name,Value,Description,Package,Manufacture,MPN,Designator,Qty,Type
+1,SMD-LED,Red,general LED red,LED-0603,Lite-On,LTST-C193KRKT-5A,"D1, D10, D11, D12, D13",5,SMD
+2,Schottky diode,100V 2A,,DO-214AC,Guangdong Hottech,SS210A,"D2, D3, D4, D5, D6, D7, D8, D9",8,SMD
+3,DC Power receptacle,,DC Power Receptacle Jack 5A 2.0mm 6.2mm,,XKB Connectivity,DC-005-5A-2.0,J1,1,THT
+4,PCB Header,"2P, Vertical",WR-TBL Serie 321 - 3.81 mm Vertical PCB Header,P=3.81mm,Ningbo Kangnex Elec,WJ15EDGVC-3.81-2P,"J2, J3, J4, J5, J6",5,THT
+5,Box header,,"Header 6P 0.100""(2.54mm) 2",61200621621,Ckmtw(Shenzhen Cankemeng),C132438,J7,1,THT
+6,N-MOSFET,,"60V 28A(Tc) 3V @ 250uA 40mΩ @ 12A,10V",TO-252-2(DPAK),Winsok Semicon,WSF28N06,"Q1, Q2, Q3, Q4",4,SMD
+7,Chip Resistor,5.6k,5% 0.25W,R0805,KOA Speer Elec,RK73B2ATTD562J,"R1, R2, R3, R4, R5",5,SMD
+8,Array Chip Resistor,10,5% 1/16W,R0603 x4,Bourns,CAY16-100J4LF,RN1,1,SMD
+9,Array Chip Resistor,10k,5% 1/16W,R0603 x4,Bourns,CAY16-103J4LF,RN2,1,SMD
