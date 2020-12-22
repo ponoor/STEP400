@@ -27,14 +27,25 @@ Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/e
 ### Max
 https://github.com/kanta/STEP400_prototype/blob/master/rev4/STEP400_proto_r4.maxpat
 
+### Processing
+https://github.com/yuskegoto/STEP400_Processing
+
+Contribution of @yuskegoto
+
 ### openFrameworks
 https://github.com/ponoor/step-series-example-openFrameworks
+
+Contribution of @niimi
 
 ### Unity
 https://github.com/ponoor/step-series-example-Unity
 
+Contribution of @niimi
+
 ### Touch Designer
 https://github.com/ponoor/step-series-example-TouchDesigner
+
+Contribution of @loveandsheep
 
 ## Documentation
 https://ponoor.com/en/docs/step400/
