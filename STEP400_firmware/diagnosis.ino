@@ -7,30 +7,150 @@ void diagnosis(uint8_t inByte) {
 	case 's':
 		printCurrentState();
 		break;
-	case 'b':
-		//sendBootMsg();
+	case 't':
+		testDipSw();
+		testPowerSTEP01();
 		break;
 	default:
 		break;
 	}
 }
+void testDipSw() {
+	showHeader("DIP Switch");
+	uint8_t t = getMyId();
+	for (uint8_t i = 0; i < 8; i++) {
+		SerialUSB.print(((t >> (7 - i)) & 1) == 1 ? "1" : "0");
+		if (i == 3) SerialUSB.print(" ");
+	}
+	SerialUSB.println();
+}
+void testPowerSTEP01() {
+	showHeader("Hardware test start");
+	uint8_t i = 0;
+	uint16_t status[NUM_OF_MOTOR];
+	uint32_t temp = 0;
 
+	//SerialUSB.println(F("PowerSTEP01 diagnosis started."));
+	for (i = 0; i < NUM_OF_MOTOR; i++) {
+		status[i] = stepper[i].getStatus();
+		temp += status[i];
+	}
+	if (temp == 0) {
+		// No responce
+		SerialUSB.println(F("PowerSTEP01 SPI connection failure."));
+	}
+	else {
+		SerialUSB.println(F("PowerSTEP01 SPI connection ok."));
+		for ( i = 0; i < NUM_OF_MOTOR; i++)
+		{
+			temp = 0;
+			SerialUSB.print(F("PowerSTEP01 ID#"));
+			SerialUSB.println(i + 1);
+			SerialUSB.print(F(" STATUS:"));
+			SerialUSB.print(status[i], HEX);
+			// OCD, active low, latched
+			if ((status[i] & STATUS_OCD) == 0) {
+				temp = 0x01;
+			}
+			// UVLO, active low
+			if ((status[i] & STATUS_UVLO) == 0) {
+				temp |= 0x02;
+			}
+			switch (temp)
+			{
+			case 0:
+				SerialUSB.println(F("... Ok"));
+				break;
+			case 1:
+				// OCD detected.
+				SerialUSB.println(F("OCD(Over Current) detected."));
+				break;
+			case 2:
+				// ULVO detected.
+				SerialUSB.println(F("UVLO(Under Voltage LockOut) detected. Check VCC pin connection."));
+				break;
+			case 3:
+				// OCD+ULVO detected.
+				SerialUSB.println(F("OCD+UVLO detected. Check clock pin connection."));
+				break;
+			default:
+				break;
+			}
+
+			// SW_F, low for open, high for close
+			if ((status[i] & STATUS_SW_F) == 1) {
+				SerialUSB.println(F("HOME senser input closed. Check SWIN connection."));
+			}
+			// ADC
+			temp = stepper[i].getParam(ADC_OUT);
+			SerialUSB.print(F(" ADC_OUT:"));
+			SerialUSB.print(temp);
+			if (temp < 31) {
+				SerialUSB.println(F("... Wrong value. Chech ADC_OUT pin connection."));
+			}
+			else {
+				SerialUSB.println(F("... Ok"));
+			}
+		}
+	}
+
+}
 void printCurrentState() {
 	SerialUSB.print("Firmware name:");
-	String version = COMPILE_DATE;
-	version += String(" ") + String(COMPILE_TIME) + String(" ") + String(FIRMWARE_NAME);
-	SerialUSB.println(version);
+	String s = COMPILE_DATE;
+	s += String(" ") + String(COMPILE_TIME) + String(" ") + String(FIRMWARE_NAME);
+	SerialUSB.println(s);
 	showHeader("DIP Switch");
-	SerialUSB.println(getMyId(), BIN); // have to fix
+	uint8_t t = getMyId();
+	for (uint8_t i = 0; i < 8; i++) {
+		SerialUSB.print(((t >> (7-i)) & 1) == 1 ? "1" : "0");
+		if (i == 3) SerialUSB.print(" ");
+	}
+	SerialUSB.println();
 	showHeader("Ethernet");
-	SerialUSB.print( F("Ethernet link status: ") );
-	SerialUSB.println( Ethernet.linkStatus() );
 	SerialUSB.print(F("Ethernet hardware status: "));
-	SerialUSB.println(Ethernet.hardwareStatus());
+	t = Ethernet.hardwareStatus();
+	SerialUSB.print(t);
+	switch (t)
+	{
+	case EthernetNoHardware:
+		s = F("-EthernetNoHardware");
+		break;
+	case EthernetW5100:
+		s = F("-EthernetW5100");
+		break;
+	case EthernetW5200:
+		s = F("-EthernetW5200");
+		break;
+	case EthernetW5500:
+		s = F("-EthernetW5500");
+		break;
+	default:
+		break;
+	}
+	SerialUSB.println(s);
+	SerialUSB.print( F("Ethernet link status: ") );
+	t = Ethernet.linkStatus();
+	SerialUSB.print(t);
+	switch (t)
+	{
+	case Unknown:
+		s = F("-Unknown");
+		break;
+	case LinkON:
+		s = F("-LinkON");
+		break;
+	case LinkOFF:
+		s = F("-LinkOff");
+		break;
+	default:
+		break;
+	}
+	SerialUSB.println(s);
 	showHeader("microSD");
 	showBoolResult(F("SD library initialize succeeded"), sdInitializeSucceeded);
 	showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);
-	showBoolResult(F("SD config file parse succeeded"), configFileParseSucceeded);
+	showBoolResult(F("SD config JSON parse succeeded"), configFileParseSucceeded);
 	showHeader("PowerSTEP01");
 	SerialUSB.print(F("STATUS"));
 	for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)

@@ -31,7 +31,7 @@ bool configFileParseSucceeded = false;
 // pins
 #define ledPin	13u
 const uint8_t dipSwPin[8] = { 7u,30u,A5,31u,2u,9u,3u,0u };//{ A5,SCL,7u,SDA,2u,9u,3u,0u };
-const uint8_t limitSwPin[4] = { 1u,5u,8u,A1 };
+//const uint8_t limitSwPin[4] = { 1u,5u,8u,A1 };
 const uint8_t brakePin[4] = { A1,8u,5u,1u };
 
 #define SD_CS_PIN	4u

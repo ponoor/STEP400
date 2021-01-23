@@ -138,6 +138,10 @@ void OSCMsgReceive() {
     }
 }
 
+bool motorIdCheck(uint8_t motorID) {
+    return (MOTOR_ID_FIRST <= motorID && motorID <= MOTOR_ID_LAST) || (motorID == MOTOR_ID_ALL);
+}
+
 #pragma region config_commands_osc_listener
 void setDestIp(OSCMessage& msg, int addrOffset) {
     bool bIpUpdated = false;
@@ -495,7 +499,10 @@ void getStatusList(OSCMessage& msg, int addrOffset) {
 
 void setMicrostepMode(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = msg.getInt(0);
-    uint8_t value = constrain(msg.getInt(1), STEP_FS, STEP_FS_128); // 0-7
+    uint8_t value = 0;
+    if (msg.isInt(1)) { value = msg.getInt(1); }
+    else if (msg.isFloat(1)) { value = (uint8_t)msg.getFloat(1); }
+    value = constrain(msg.getInt(1), STEP_FS, STEP_FS_128); // 0-7
     if (MOTOR_ID_FIRST <= motorID && motorID <= MOTOR_ID_LAST) {
         stepper[motorID - MOTOR_ID_FIRST].configStepMode(value);
         microStepMode[motorID - MOTOR_ID_FIRST] = value;
@@ -643,7 +650,9 @@ void getOverCurrentThreshold(OSCMessage& msg, int addrOffset) {
 
 void setLowSpeedOptimizeThreshold(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = msg.getInt(0);
-    float _minSpeed = msg.getFloat(1);
+    float _minSpeed = 0.0;
+    if (msg.isFloat(1)) { _minSpeed = msg.getFloat(1); }
+    else if (msg.isInt(1)) { _minSpeed = (float)msg.getInt(1); }
     if (MOTOR_ID_FIRST <= motorID && motorID <= MOTOR_ID_LAST) {
         motorID -= MOTOR_ID_FIRST;
         stepper[motorID].setMinSpeed(_minSpeed);
@@ -683,7 +692,13 @@ void getLowSpeedOptimizeThreshold(uint8_t motorID) {
 
 void setBemfParam(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = msg.getInt(0);
-    uint16_t intSpeed = constrain(msg.getInt(1), 0, 0x3FFF);
+    if (motorIdCheck(motorID)) {
+        // todo
+    }
+    uint16_t intSpeed = intersectSpeed[motorID - MOTOR_ID_FIRST];
+    if (msg.isInt(1)) { intSpeed = msg.getInt(1); }
+    else if (msg.isFloat(1)) { intSpeed = (uint16_t)msg.getFloat(1); }
+    intSpeed = constrain(msg.getInt(1), 0, 0x3FFF);
     uint8_t
         stSlp = constrain(msg.getInt(2), 0, 255),
         fnSlpAcc = constrain(msg.getInt(3), 0, 255),
