@@ -8,13 +8,13 @@
 
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
-constexpr auto FIRMWARE_NAME = "STEP400_r1.0.0_hardware_test";
+constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.0.0";
 
 String results;
 FlashStorage(storage, String);
 
 #define ledPin  13u
-const uint8_t dipSwPin[8] = { 7u,30u,A5,31u,2u,9u,3u,0u };//{ A5,SCL,7u,SDA,2u,9u,3u,0u };
+const uint8_t dipSwPin[8] = { 7u,30u,A5,31u,2u,9u,3u,0u };
 const uint8_t brakePin[4] = { A1,8u,5u,1u };
 const uint8_t auxPin[3] = { SCL,SDA,38u };
 #define SD_CS_PIN 4u
