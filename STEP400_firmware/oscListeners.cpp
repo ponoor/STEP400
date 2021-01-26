@@ -1,3 +1,10 @@
+// 
+// 
+// 
+
+#include "oscListeners.h"
+#include "utils.h"
+
 void OSCMsgReceive() {
     bool bMsgHasError = false, bMsgRouted = false;
     OSCMessage msgIN;
@@ -133,7 +140,7 @@ void OSCMsgReceive() {
             }
         }
         else {
-          sendOneString("/error/osc", "oscSyntaxError");
+            sendOneString("/error/osc", "oscSyntaxError");
         }
     }
 }
@@ -179,7 +186,7 @@ void getConfigName(OSCMessage& msg, int addrOffset) {
 }
 
 void getConfigRegister(uint8_t deviceID) {
-    sendTwoInt("/configRegister", deviceID, stepper[deviceID-MOTOR_ID_FIRST].getParam(CONFIG));
+    sendTwoInt("/configRegister", deviceID, stepper[deviceID - MOTOR_ID_FIRST].getParam(CONFIG));
 }
 void getConfigRegister(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = msg.getInt(0);
@@ -1786,3 +1793,4 @@ void setCurrentMode(OSCMessage& msg, int addrOffset) {
 }
 
 #pragma endregion PowerSTEP01_config_osc_listener
+

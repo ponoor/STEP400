@@ -1,3 +1,13 @@
+// 
+// 
+// 
+
+#include "loadConfig.h"
+#include "globals.h"
+#include <ArduinoJson.h>
+#include <SD.h>
+#include <SPI.h>
+
 void loadConfig() {
     uint8_t i;
     if (digitalRead(SD_DETECT_PIN) == LOW)
@@ -167,76 +177,3 @@ void loadConfig() {
         kD[i] = servoMode_kD[i] | 0.0;
     }
 }
-
-// for debug
-void setDefaultVal() {
-    inPort = 50000;
-    outPort = 50100;
-    isOutPortAddId = true;
-    isMacAddId = true;
-    isDestIpSet = false;
-
-    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
-    {
-        //busy[i] = false;
-        //flag[i] = false;
-        //HiZ[i] = false;
-        //homeSwState[i] = false;
-        //dir[i] = false;
-        //uvloStatus[i] = false;
-        //motorStatus[i] = 0;
-        //thermalStatus[i] = 0;
-
-        //reportBUSY[i] = false;
-        //reportFLAG[i] = false;
-        //reportHiZ[i] = false;
-        //reportHomeSwStatus[i] = false;
-        //reportDir[i] = false;
-        //reportMotorStatus[i] = false;
-        //reportSwEvn[i] = false;
-        //reportCommandError[i] = true;
-        //reportUVLO[i] = true;
-        //reportThermalStatus[i] = true;
-        //reportOCD[i] = true;
-        //reportStall[i] = true;
-        //overCurrentThreshold[i] = 15; //
-
-        //limitSwState[i] = false;
-        //reportLimitSwStatus[i] = false;
-        //limitSwMode[i] = false;
-
-        //microStepMode[i] = STEP_SEL_1_128;
-        //homeSwMode[i] = true;
-        //isCurrentMode[i] = false;
-        //slewRate[i] = SR_980V_us;
-        //electromagnetBrakeEnable[i] = false;
-
-        //acc[i] = 1000.;
-        //dec[i] = 1000.;
-        //maxSpeed[i] = 650.;
-        //fullStepSpeed[i] = 15610.;
-
-        //kvalHold[i] = tvalHold[i] = 0;
-        //kvalRun[i] = tvalRun[i] = 16;
-        //kvalAcc[i] = tvalAcc[i] = 16;
-        //kvalDec[i] = tvalDec[i] = 16;
-
-        //intersectSpeed[i] = 0x0408; // INT_SPEED
-        //startSlope[i] = 0x19;// ST_SLP
-        //accFinalSlope[i] = 0x29; // FN_SLP_ACC
-        //decFinalSlope[i] = 0x29; // FN_SLP_DEC
-        //lowSpeedOptimize[i] = 20.;
-        //fastDecaySetting[i] = 0x19; // T_FAST
-        //minOnTime[i] = 0x29; // TON_MIN
-        //minOffTime[i] = 0x29; // TOFF_MIN
-
-        //targetPosition[i] = 0;
-        //kP[i] = 0.06f;
-        //kI[i] = 0.0f;
-        //kD[i] = 0.0f;
-        //isServoMode[i] = false;
-
-    }
-}
-
-
