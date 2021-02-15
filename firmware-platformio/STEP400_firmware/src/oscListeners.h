@@ -14,16 +14,15 @@
 
 void OSCMsgReceive();
 
-bool motorIdCheck(uint8_t motorID);
+bool isCorrectMotorId(uint8_t motorID);
 
-#pragma region config_commands_osc_listener
+// config_commands_osc_listener
 void setDestIp(OSCMessage& msg, int addrOffset);
 void getVersion(OSCMessage& msg, int addrOffset);
 void getConfigName(OSCMessage& msg, int addrOffset);
 void getConfigRegister(uint8_t deviceID);
 void getConfigRegister(OSCMessage& msg, int addrOffset);
 void resetMotorDriver(OSCMessage& msg, int addrOffset);
-void setDebugMode(OSCMessage& msg, int addrOffset);
 void getAdcVal(OSCMessage& msg, int addrOffset);
 void setBrakeOut(OSCMessage& msg, int addrOffset);
 void resetDev(OSCMessage& msg, int addrOffset);
@@ -72,9 +71,9 @@ void getBemfParam(uint8_t motorID);
 void setDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(uint8_t motorID);
-#pragma endregion config_commands_osc_listener
+void enableElectromagnetBrake(OSCMessage& msg, int addrOffset);
 
-#pragma region kval_commands_osc_listener
+//  kval_commands_osc_listener
 void setKval(OSCMessage& msg, int addrOffset);
 void setHoldKval(OSCMessage& msg, int addrOffset);
 void setRunKval(OSCMessage& msg, int addrOffset);
@@ -82,11 +81,9 @@ void setAccKval(OSCMessage& msg, int addrOffset);
 void setDecKval(OSCMessage& msg, int addrOffset);
 void getKval(OSCMessage& msg, int addrOffset);
 void getKval(uint8_t motorID);
-#pragma endregion kval_commands_osc_listener
 
-#pragma region tval_commands_osc_listener
+// tval_commands_osc_listener
 void setTval(OSCMessage& msg, int addrOffset);
-
 void setHoldTval(OSCMessage& msg, int addrOffset);
 void setRunTval(OSCMessage& msg, int addrOffset);
 void setAccTval(OSCMessage& msg, int addrOffset);
@@ -96,13 +93,10 @@ void getTval(uint8_t motorID);
 float TvalToCurrent(uint8_t tval);
 void getTval_mA(uint8_t motorID);
 void getTval_mA(OSCMessage& msg, int addrOffset);
-#pragma endregion tval_commands_osc_listener
 
-#pragma region speed_commands_osc_listener
-
+// speed_commands_osc_listener
 void setSpeedProfile(OSCMessage& msg, int addrOffset);
 void setMaxSpeed(OSCMessage& msg, int addrOffset);
-// MIN_SPEED register is set by setLowSpeedOptimizeThreshold function.
 void setFullstepSpeed(OSCMessage& msg, int addrOffset);
 void getFullstepSpeed(OSCMessage& msg, int addrOffset);
 void setAcc(OSCMessage& msg, int addrOffset);
@@ -118,10 +112,8 @@ void getSpeedProfile(OSCMessage& msg, int addrOffset);
 void getSpeedProfile(uint8_t motorID);
 void getSpeedProfileRaw(OSCMessage& msg, int addrOffset);
 void getSpeedProfileRaw(uint8_t motorID);
-#pragma endregion speed_commands_osc_listener
 
-#pragma region operational_commands_osc_listener
-
+// operational_commands_osc_listener
 void getPosition(OSCMessage& msg, int addrOffset);
 void getMark(OSCMessage& msg, int addrOffset);
 void run(OSCMessage& msg, int addrOffset);
@@ -141,24 +133,30 @@ void softStop(OSCMessage& msg, int addrOffset);
 void hardStop(OSCMessage& msg, int addrOffset);
 void softHiZ(OSCMessage& msg, int addrOffset);
 void hardHiZ(OSCMessage& msg, int addrOffset);
-#pragma endregion operational_commands_osc_listener
+void excitation(OSCMessage& msg, int addrOffset);
 
-#pragma region servo_commands_osc_listener
+// servo_commands_osc_listener
 void setTargetPosition(OSCMessage& msg, int addrOffset);
 void setTargetPositionList(OSCMessage& msg, int addrOffset);
 void enableServoMode(OSCMessage& msg, int addrOffset);
 void setServoParam(OSCMessage& msg, int addrOffset);
 void getServoParam(uint8_t motorID);
 void getServoParam(OSCMessage& msg, int addrOffset);
-#pragma endregion servo_commands_osc_listener
 
-
-#pragma region PowerSTEP01_config_osc_listener
+// PowerSTEP01_config_osc_listener
 void setVoltageMode(uint8_t motorID);
 void setVoltageMode(OSCMessage& msg, int addrOffset);
 void setCurrentMode(uint8_t motorID);
 void setCurrentMode(OSCMessage& msg, int addrOffset);
-#pragma endregion PowerSTEP01_config_osc_listener
 
+void sendErrorMsg(uint8_t motorID, uint8_t errorNum);
+
+enum {
+	OscSyntaxError = 0,
+	MessageNotMatch,
+	WrongDataType,
+	MotorIdNotMatch,
+	OutOfRange
+};
 #endif
 

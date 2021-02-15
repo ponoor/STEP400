@@ -67,66 +67,70 @@ void resetMotorDriver(uint8_t deviceID) {
     }
 }
 
-void sendOneInt(String address, int32_t data) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add((int32_t)data);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
+int getInt(OSCMessage &msg, uint8_t offset) 
+{
+	int msgVal = 0;
+	if (msg.isFloat(offset))
+	{
+		msgVal = (int) msg.getFloat(offset);
+	}
+	else if (msg.isInt(offset))
+	{
+		msgVal = getInt(msg, offset);
+	}
+    else {
+        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+    }
+	return msgVal;
 }
 
-void sendTwoInt(String address, int32_t data1, int32_t data2) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add(data1).add(data2);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
+float getFloat(OSCMessage &msg, uint8_t offset)
+{
+	float msgVal = 0;
+	if (msg.isFloat(offset))
+	{
+		msgVal = msg.getFloat(offset);
+	}
+	else if (msg.isInt(offset))
+	{
+		msgVal = getInt(msg, offset);
+	}
+    else {
+        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+    }
+	return msgVal;
+}
+
+bool getBool(OSCMessage &msg, uint8_t offset)
+{
+    bool msgVal = 0;
+	if (msg.isFloat(offset))
+	{
+		msgVal = msg.getFloat(offset) >= 1.0;
+	}
+	else if (msg.isInt(offset))
+	{
+		msgVal = msg.getInt(offset) > 0;
+	}
+    else if (msg.isBoolean(offset)) 
+    {
+        msgVal = msg.getBoolean(offset);
+    }
+    else {
+        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+    }
+	return msgVal;
+    
+}
+
+void sendMotorIdError(uint8_t motorID) {
+    sendTwoData(F("/error/command"),F("MotorIdNotMatch"), motorID);
 }
 
 void sendThreeInt(String address, int32_t data1, int32_t data2, int32_t data3) {
     if (!isDestIpSet) { return; }
     OSCMessage newMes(address.c_str());
     newMes.add(data1).add(data2).add(data3);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
-}
-
-void sendIdFloat(String address, int32_t id, float data) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add(id).add(data);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
-}
-
-void sendOneString(String address, const char* data) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add(data);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
-}
-
-template <class T>
-T sendTwoData(String address, T data1, T data2) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add(data1).add(data2);
     Udp.beginPacket(destIp, outPort);
     newMes.send(Udp);
     Udp.endPacket();

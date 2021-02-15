@@ -37,7 +37,6 @@ const uint8_t brakePin[4] = { A1,8u,5u,1u };
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
 constexpr auto FIRMWARE_NAME = "STEP400_r1.0.0";
-extern boolean debugMode;
 #define STATUS_POLL_PERIOD   1 // [ms]
 
 // Tx, Rx LED

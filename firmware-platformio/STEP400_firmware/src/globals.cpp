@@ -4,8 +4,6 @@
 
 #include "globals.h"
 
-boolean debugMode = false;
-
 // Tx, Rx LED
 bool rxLedEnabled = false, txLedEnabled = false;
 uint32_t RXL_blinkStartTime, TXL_blinkStartTime;
@@ -93,7 +91,7 @@ uint8_t
 uint16_t slewRate[NUM_OF_MOTOR]; // GATECFG1
 uint8_t slewRateNum[NUM_OF_MOTOR]; // [0]114, [1]220, [2]400, [3]520, [4]790, [5]980.
 float lowSpeedOptimize[NUM_OF_MOTOR];
-bool electromagnetBrakeEnable[NUM_OF_MOTOR];
+bool electromagnetBrakeEnable[NUM_OF_MOTOR] = {1,1,1,1};
 
 float
     acc[NUM_OF_MOTOR],

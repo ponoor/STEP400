@@ -223,7 +223,7 @@ void printParameters() {
 	showBoolResult(F("isDestIpSet"), isDestIpSet);
 
 	printHeader("Report & Alarm");
-	print4data("reportBUSY", reportBUSY); //
+	show4Bool("reportBUSY", reportBUSY); 
 	show4Bool(F("reportBUSY"), reportBUSY);
 	show4Bool(F("reportFLAG"), reportFLAG);
 	show4Bool(F("reportHiZ"), reportHiZ);
