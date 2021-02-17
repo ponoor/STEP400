@@ -8,6 +8,7 @@
 #else
 	#include "WProgram.h"
 #endif
+#include <SPI.h>
 #include <Ponoor_PowerSTEP01Library.h>
 #include <Ethernet.h>
 
@@ -53,7 +54,7 @@ extern bool configFileParseSucceeded;
 
 // PowerSTEP01
 #define NUM_OF_MOTOR   (4)
-extern powerSTEP stepper[NUM_OF_MOTOR];
+extern powerSTEP stepper[];
 #define MOTOR_ID_ALL    255
 #define MOTOR_ID_FIRST  1
 #define MOTOR_ID_LAST   4
@@ -69,7 +70,7 @@ extern IPAddress
 const IPAddress broadcastIp(255, 255, 255, 255);
 extern unsigned int inPort, outPort;
 extern EthernetUDP Udp;
-extern boolean
+extern bool
     isDestIpSet,
     isMyIpAddId,
     isMacAddId,
@@ -80,6 +81,18 @@ extern boolean
 
 // Motor settings.
 #define TVAL_LIMIT_VAL  64 // approx. 5A
+
+// brake
+extern uint8_t brakeStatus[4];
+enum {
+    BRAKE_CLOSED = 0,
+    BRAKE_OPEN_WAITING, // motor excited
+    BRAKE_OPENED,
+    BRAKE_DEEXCITATION_WAITING // brake closed
+};
+extern uint32_t brakeTranisitionTrigTime[4];
+#define BRAKE_TRANSITION_DURATION   120
+
 // These values will be initialized at loadConfig()
 extern bool
     busy[NUM_OF_MOTOR],

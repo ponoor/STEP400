@@ -21,7 +21,6 @@ powerSTEP stepper[] = {
     powerSTEP(1, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN),
     powerSTEP(0, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN)
 };
-
 // Network
 uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x02, 0x00 },
 myId = 0;
@@ -41,6 +40,8 @@ boolean
     isOutPortAddId,
     bootedMsgEnable;
 boolean isWaitingSendBootMsg = false;
+uint8_t brakeStatus[4] = { 0,0,0,0 }; 
+uint32_t brakeTranisitionTrigTime[4];
 
 // Motor settings
 bool 
