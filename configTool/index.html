@@ -25,11 +25,30 @@
 <ul class="input-list">
 <li>
     <div class="input-label">
-        <label class="hint">configuration name</label>
+        <label class="hint">Configuration name</label>
         <p class="tooltip">The name of this configuration for your reference.</p>
     </div>
     <div class="input-items">
         <input type="text" name="configName" maxlength="32">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Configuration version</label>
+        <p class="tooltip">The version number of the loaded config file. Read only.</p>
+    </div>
+    <div class="input-items">
+        <input type="number" name="configVersion" size="10" min="0" max="255" value="1" readonly="readonly">
+        <input type="number" name="configVersion" size="10" min="0" max="255" value="0" readonly="readonly">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Target product</label>
+        <p class="tooltip">The target product name of thr loaded config file.</p>
+    </div>
+    <div class="input-items">
+        <input type="text" name="targetProduct" maxlength="32" value="STEP400" readonly="readonly" >
     </div>
 </li>
 </ul>
@@ -624,6 +643,20 @@
         <input type="checkbox" name="electromagnetBrakeEnable">
         <input type="checkbox" name="electromagnetBrakeEnable">
         <input type="checkbox" name="electromagnetBrakeEnable">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Brake transition duration</label>
+        <p class="tooltip">The overlap duration between activating the motor and engaging the brake.</p>
+    </div>
+    <div class="input-items">
+        <input type="number" name="brakeTransitionDuration" min="0" max="10000" value="100" step="1">
+        <input type="number" name="brakeTransitionDuration" min="0" max="10000" value="100" step="1">
+        <input type="number" name="brakeTransitionDuration" min="0" max="10000" value="100" step="1">
+        <input type="number" name="brakeTransitionDuration" min="0" max="10000" value="100" step="1">
+        <input type="number" name="brakeTransitionDuration" min="0" max="10000" value="100" step="1">
+        ms
     </div>
 </li>
 </ul>

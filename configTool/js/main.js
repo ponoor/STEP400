@@ -2,7 +2,9 @@ window.addEventListener('DOMContentLoaded', function() {
     var NUM_MOTOR = 4;
     var inputElements = {
         information: {
-            configName: document.querySelector("input[name='configName']")
+            configName: document.querySelector("input[name='configName']"),
+            configVersion: document.querySelectorAll("input[name='configVersion']"),
+            targetProduct: document.querySelector("input[name='targetProduct']")
         },
         network: {
             myIp: document.querySelectorAll("input[name='myIp']"),
@@ -41,7 +43,8 @@ window.addEventListener('DOMContentLoaded', function() {
             limitSwMode: document.querySelectorAll("input[name='limitSwMode']"),
             isCurrentMode: document.querySelectorAll("input[name='isCurrentMode']"),
             slewRate: document.querySelectorAll("select[name='slewRate']"),
-            electromagnetBrakeEnable: document.querySelectorAll("input[name='electromagnetBrakeEnable']")
+            electromagnetBrakeEnable: document.querySelectorAll("input[name='electromagnetBrakeEnable']"),
+            brakeTransitionDuration: document.querySelectorAll("input[name='brakeTransitionDuration']")
         }, 
         speedProfile: {
             acc: document.querySelectorAll("input[name='acc']"),
@@ -202,27 +205,32 @@ window.addEventListener('DOMContentLoaded', function() {
 
         fileReader.onload = function(e) {
             var jsonObject = JSON.parse(e.target.result);
-
+            
             for(catName in inputElements) {
-                for (paramName in inputElements[catName]) {
-                    if (catName === 'network' || catName === 'information') {
-                        if (0 < inputElements[catName][paramName].length) {
-                            for (var i = 0; i < inputElements[catName][paramName].length; i++) {
-                                setInputValue(inputElements[catName][paramName][i], jsonObject[catName][paramName][i]);
-                            }
-                        } else {
-                            setInputValue(inputElements[catName][paramName], jsonObject[catName][paramName]);
-                        }
-                    } else {
-                        for (paramName in inputElements[catName]) {
-                            for (var i = 0; i < NUM_MOTOR; i ++) {
-                                setInputValue(inputElements[catName][paramName][i+1], jsonObject[catName][paramName][i]);
+                if (jsonObject[catName] !== undefined) {
+                    for (paramName in inputElements[catName]) {
+                        if (jsonObject[catName][paramName] !== undefined) {
+                            if (catName === 'network' || catName === 'information') {
+                                if (0 < inputElements[catName][paramName].length) {
+                                    for (var i = 0; i < inputElements[catName][paramName].length; i++) {
+                                        setInputValue(inputElements[catName][paramName][i], jsonObject[catName][paramName][i]);
+                                    }
+                                } else {
+                                    setInputValue(inputElements[catName][paramName], jsonObject[catName][paramName]);
+                                }
+                            } else {
+                                for (paramName in inputElements[catName]) {
+                                    for (var i = 0; i < NUM_MOTOR; i ++) {
+                                        setInputValue(inputElements[catName][paramName][i+1], jsonObject[catName][paramName][i]);
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
             function setInputValue(elm, val) {
+                
                 if (elm.tagName === 'INPUT') {
 
                     var type = elm.getAttribute('type');
