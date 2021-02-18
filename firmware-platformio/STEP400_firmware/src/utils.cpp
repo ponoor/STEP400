@@ -50,7 +50,7 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].setVoltageComp(VS_COMP_DISABLE);
         stepper[deviceID].setOCThreshold(overCurrentThreshold[deviceID]); // 5A for 0.1ohm shunt resistor
         stepper[deviceID].setOCShutdown(OC_SD_ENABLE);
-        stepper[deviceID].setOscMode(EXT_24MHZ_OSCOUT_INVERT);
+        stepper[deviceID].setOscMode(EXT_16MHZ_OSCOUT_INVERT);
         stepper[deviceID].setRunKVAL(kvalRun[deviceID]);
         stepper[deviceID].setAccKVAL(kvalAcc[deviceID]);
         stepper[deviceID].setDecKVAL(kvalDec[deviceID]);
@@ -76,7 +76,7 @@ int getInt(OSCMessage &msg, uint8_t offset)
 	}
 	else if (msg.isInt(offset))
 	{
-		msgVal = getInt(msg, offset);
+		msgVal = msg.getInt(offset);
 	}
     else {
         sendOneDatum(F("/error/osc"),F("WrongDataType"));
@@ -93,7 +93,7 @@ float getFloat(OSCMessage &msg, uint8_t offset)
 	}
 	else if (msg.isInt(offset))
 	{
-		msgVal = getInt(msg, offset);
+		msgVal = msg.getInt(offset);
 	}
     else {
         sendOneDatum(F("/error/osc"),F("WrongDataType"));

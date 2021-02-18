@@ -26,9 +26,6 @@ SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, S
 // Servo mode
 constexpr auto position_tolerance = 0; // steps
 
-// brake
-boolean bTurnOnWaiting[4] = { 0,0,0,0 };
-
 // for PlatformIO
 void sendBootMsg(uint32_t _currentTime);
 void resetEthernet();
@@ -227,7 +224,23 @@ void checkLED(uint32_t _currentTimeMillis) {
 }
 
 void checkBrake(uint32_t _currentTimeMillis) {
-    //
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+    {
+        if (electromagnetBrakeEnable[i]) {
+            if (brakeStatus[i] == BRAKE_OPEN_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= BRAKE_TRANSITION_DURATION) {
+                    digitalWrite(brakePin[i], HIGH);
+                    brakeStatus[i] = BRAKE_OPENED;
+                }
+            } else if (brakeStatus[i] == BRAKE_DEEXCITATION_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= BRAKE_TRANSITION_DURATION) {
+                    stepper[i].hardHiZ();
+                    brakeStatus[i] = BRAKE_CLOSED;
+                }
+            }
+        }
+    }
+    
 }
 void updateServo(uint32_t currentTimeMicros) {
     static uint32_t lastServoUpdateTime = 0;
@@ -270,6 +283,7 @@ void loop() {
     {
         checkStatus();
         checkLimitSw();
+        checkBrake(currentTimeMillis);
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();
         if (myId != t) {

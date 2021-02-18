@@ -102,6 +102,7 @@ void printCurrentState() {
 		break;
 	}
 	SerialUSB.println(s);
+	showBoolResult(F("isDestIpSet"), isDestIpSet);
 	printHeader("microSD");
 	showBoolResult(F("SD library initialize succeeded"), sdInitializeSucceeded);
 	showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);
@@ -198,6 +199,16 @@ void printCurrentState() {
 				p("Unexpected value.\n");
 			}
 		}
+	}
+	
+	printHeader("Modes");
+	show4Bool(F("Servo Mode"),isServoMode);
+	show4Bool(F("Current Mode"), isCurrentMode);
+	show4Bool(F("Electromagnetic Brake Enable"),electromagnetBrakeEnable);
+	p("Brake status :\n");
+	String bsText[4] = {"BRAKE_CLOSED","BRAKE_OPEN_WAITING","BRAKE_OPENED","BRAKE_DEEXCITATION_WAITING"};
+	for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
+		p("#%d : %s\n",i+1,bsText[brakeStatus[i]].c_str());
 	}
 }
 

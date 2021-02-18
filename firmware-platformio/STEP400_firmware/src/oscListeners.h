@@ -13,8 +13,10 @@
 #include <OSCMessage.h>
 
 void OSCMsgReceive();
-
 bool isCorrectMotorId(uint8_t motorID);
+
+void excitation(uint8_t motorID, bool state);
+void free(uint8_t motorID);
 
 // config_commands_osc_listener
 void setDestIp(OSCMessage& msg, int addrOffset);
@@ -134,6 +136,7 @@ void hardStop(OSCMessage& msg, int addrOffset);
 void softHiZ(OSCMessage& msg, int addrOffset);
 void hardHiZ(OSCMessage& msg, int addrOffset);
 void excitation(OSCMessage& msg, int addrOffset);
+void free(OSCMessage& msg, int addrOffset);
 
 // servo_commands_osc_listener
 void setTargetPosition(OSCMessage& msg, int addrOffset);

@@ -42,7 +42,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/softHiZ", softHiZ);
             bMsgRouted |= msgIN.route("/hardHiZ", hardHiZ);
             bMsgRouted |= msgIN.route("/excitation", excitation);
-
+            bMsgRouted |= msgIN.route("/free", free);
             // servo mode
             bMsgRouted |= msgIN.route("/enableServoMode", enableServoMode);
             bMsgRouted |= msgIN.route("/setServoParam", setServoParam);
@@ -138,7 +138,6 @@ void OSCMsgReceive() {
             //digitalWrite(ledPin, bMsgRouted);
             if (!bMsgRouted) {
                 sendOneDatum("/error/osc", "MessageNotMatch");
-                
             }
         }
         else {
@@ -885,12 +884,12 @@ void enableElectromagnetBrake(OSCMessage& msg, int addrOffset) {
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
         electromagnetBrakeEnable[motorID] = bEnable;
-        if (bEnable) pinMode(brakePin[motorID], OUTPUT)
+        if (bEnable) pinMode(brakePin[motorID], OUTPUT);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             electromagnetBrakeEnable[i] = bEnable;
-            if (bEnable) pinMode(brakePin[i], OUTPUT)
+            if (bEnable) pinMode(brakePin[i], OUTPUT);
         }
     } else {
         sendMotorIdError(motorID);
@@ -900,7 +899,7 @@ void enableElectromagnetBrake(OSCMessage& msg, int addrOffset) {
 
 #pragma region kval_commands_osc_listener
 
-void setKval(uint8_t motorID, uint8_t hold, uint8_t run, uint8_t acc, uint8_t dec) {            motorID -= MOTOR_ID_FIRST;
+void setKval(uint8_t motorID, uint8_t hold, uint8_t run, uint8_t acc, uint8_t dec) {
     if (!isCurrentMode[motorID]) {
         stepper[motorID].setHoldKVAL(hold);
         stepper[motorID].setRunKVAL(run);
@@ -915,10 +914,14 @@ void setKval(uint8_t motorID, uint8_t hold, uint8_t run, uint8_t acc, uint8_t de
 
 void setKval(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
-    int hold = constrain(getInt(msg, 1), 0, 255);
-    int run = constrain(getInt(msg, 2), 0, 255);
-    int acc = constrain(getInt(msg, 3), 0, 255);
-    int dec = constrain(getInt(msg, 4), 0, 255);
+    int hold = getInt(msg, 1);
+    hold = constrain(hold, 0, 255);
+    int run = getInt(msg, 2);
+    run = constrain(run, 0, 255);
+    int acc = getInt(msg, 3);
+    acc = constrain(acc, 0, 255);
+    int dec = getInt(msg, 4);
+    dec = constrain(dec, 0, 255);
     if (isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
         setKval(motorID, hold, run, acc, dec);
@@ -1781,38 +1784,87 @@ void softHiZ(OSCMessage& msg, int addrOffset) {
 void hardHiZ(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
-        isServoMode[motorID - MOTOR_ID_FIRST] = false;
-        stepper[motorID - MOTOR_ID_FIRST].hardHiZ();
+        motorID -= MOTOR_ID_FIRST;
+        isServoMode[motorID] = false;
+        if (electromagnetBrakeEnable[motorID]) {
+            excitation(motorID, false);
+        } else {
+            stepper[motorID].hardHiZ();
+        }
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             isServoMode[i] = false;
-            stepper[i].hardHiZ();
+            if (electromagnetBrakeEnable[i]) {
+              excitation(i, false);
+            } else {
+                stepper[i].hardHiZ();
+            }
         }
     } else {
         sendMotorIdError(motorID);
     }
 }
 
-void excitation(OSCMessage& msg, int addrOffset) {
+void excitation(uint8_t motorID, bool state) {
+    if (electromagnetBrakeEnable[motorID]) {
+        if (((brakeStatus[motorID] == BRAKE_CLOSED) || (brakeStatus[motorID] == BRAKE_DEEXCITATION_WAITING)) && state) {
+            if (!isCurrentMode[motorID]) {
+                digitalWrite(ledPin, !digitalRead(ledPin));
+                uint8_t t = kvalRun[motorID]>>1;
+                if (kvalHold[motorID]< t) {
+                    stepper[motorID].setHoldKVAL(t);
+                    kvalHold[motorID] = t;
+                }
+            } else {
+                uint8_t t = tvalRun[motorID]>>1;
+                if (tvalHold[motorID]< t) {
+                    stepper[motorID].setHoldTVAL(t);
+                    tvalHold[motorID] = t;
+                }
+            }
+            stepper[motorID].hardStop();
+            brakeStatus[motorID] = BRAKE_OPEN_WAITING;
+            brakeTranisitionTrigTime[motorID] = millis();
+        }
+        else if (((brakeStatus[motorID] == BRAKE_OPENED) || (brakeStatus[motorID] == BRAKE_OPEN_WAITING))&& !state) {
+            digitalWrite(brakePin[motorID], LOW);
+            brakeStatus[motorID] = BRAKE_DEEXCITATION_WAITING;
+            brakeTranisitionTrigTime[motorID] = millis();
+        }
+    }
+}
+void excitation(OSCMessage& msg, int addrOffset) {    
     uint8_t motorID = getInt(msg, 0);
     bool state = getBool(msg,1);
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        if (electromagnetBrakeEnable[motorID]) {
-            if (!isCurrentMode[motorID]) {
-                uint8_t t = kvalRun[motorID]>>1;
-                if (kvalHold[motorID]< t) {
-                    stepper[motorID].setHoldKVAL(t);
-                }
-            }
-        }
-        kvalHold[motorID] = kvalInput;
-        }
+        excitation(motorID, state);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            electromagnetBrakeEnable[i] = state;
+            excitation(i, state);
+        }
+    } else {
+        sendMotorIdError(motorID);
+    }
+}
+void free(uint8_t motorID) {
+    if (electromagnetBrakeEnable[motorID]) {
+        digitalWrite(brakePin[motorID], HIGH);
+        stepper[motorID].hardHiZ();
+        brakeStatus[motorID] = BRAKE_OPENED;
+    }
+}
+void free(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        motorID -= MOTOR_ID_FIRST;
+        free(motorID);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            free(i);
         }
     } else {
         sendMotorIdError(motorID);
