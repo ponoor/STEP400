@@ -15,15 +15,24 @@ void loadConfig() {
     // Allocate a temporary JsonDocument
     // Don't forget to change the capacity to match your requirements.
     // Use arduinojson.org/v6/assistant to compute the capacity.
-    const size_t capacity = 49 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(6) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(6) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(8) + JSON_OBJECT_SIZE(10) + JSON_OBJECT_SIZE(13) + JSON_OBJECT_SIZE(14) + 830;
-    DynamicJsonDocument doc(capacity);
+    DynamicJsonDocument doc(7200); // 6144
     DeserializationError error = deserializeJson(doc, file);
+    if (error) {
+        p("Failed to read file: %s\nUsing default configuration.\n", error.f_str());
+    }
     configFileParseSucceeded = (error == false);
     file.close();
     SD.end();
 
     // Information
-    configName = doc["information"]["configName"] | "Default";
+    JsonObject information = doc["information"];
+    configName = information["configName"] | "Default";
+    if (configFileOpenSucceeded) {
+        for (i=0;i<2; i++) {
+            loadedConfigVersion[i] = information["configVersion"][i] | 0;
+        }
+    }
+    configTargetProduct = information["targetProduct"] | "---";
 
     // Network
     JsonObject network = doc["network"];
@@ -70,7 +79,6 @@ void loadConfig() {
     for (i = 0; i < NUM_OF_MOTOR; i++)
     {
         reportBUSY[i] = alarmAndReport_reportBUSY[i] | false;
-        reportFLAG[i] = alarmAndReport_reportFLAG[i] | false;
         reportHiZ[i] = alarmAndReport_reportHiZ[i] | false;
         reportHomeSwStatus[i] = alarmAndReport_reportHomeSwStatus[i] | false;
         reportDir[i] = alarmAndReport_reportDir[i] | false;
@@ -93,6 +101,7 @@ void loadConfig() {
     JsonArray driverSettings_isCurrentMode = driverSettings["isCurrentMode"];
     JsonArray driverSettings_slewRate = driverSettings["slewRate"];
     JsonArray driverSettings_electromagnetBrakeEnable = driverSettings["electromagnetBrakeEnable"];
+    JsonArray driverSettings_brakeTransitionDuration = driverSettings["brakeTransitionDuration"];
     uint16_t slewRateVal[6] = { SR_114V_us, SR_220V_us, SR_400V_us, SR_520V_us, SR_790V_us, SR_980V_us };
     for (i = 0; i < NUM_OF_MOTOR; i++) {
         microStepMode[i] = driverSettings_stepMode[i] | STEP_SEL_1_128;
@@ -102,6 +111,7 @@ void loadConfig() {
         slewRateNum[i] = constrain((driverSettings_slewRate[i] | 5), 0, 5); // default SR_980V_us
         slewRate[i] = slewRateVal[slewRateNum[i]];
         electromagnetBrakeEnable[i] = driverSettings_electromagnetBrakeEnable[i] | false;
+        brakeTransitionDuration[i] = driverSettings_brakeTransitionDuration[i] | 100;
     }
 
     // Speed profile
@@ -170,5 +180,25 @@ void loadConfig() {
         kP[i] = servoMode_kP[i] | 0.06;
         kI[i] = servoMode_kI[i] | 0.0;
         kD[i] = servoMode_kD[i] | 0.0;
+    }
+}
+
+uint8_t checkConfigVersion() {
+    if (loadedConfigVersion[0] == -1) {
+        return CONFIG_VERSION_NOTLOADED;
+    } else if ((loadedConfigVersion[0] == 0) && (loadedConfigVersion[1] == 0)) {
+        return CONFIG_VERSION_UNDEFINED;
+    } else if (loadedConfigVersion[0] > applicableConfigVersion[0]) {
+        return CONFIG_VERSION_NEW;
+    } else if (loadedConfigVersion[0] < applicableConfigVersion[0]) {
+        return CONFIG_VERSION_OLD;
+    } else {
+        if (loadedConfigVersion[1] > applicableConfigVersion[1]) {
+            return CONFIG_VERSION_NEW;
+        } else if (loadedConfigVersion[1] < applicableConfigVersion[1]) {
+            return CONFIG_VERSION_OLD;
+        } else {
+            return CONFIG_VERSION_APPLICABLE;
+        }
     }
 }

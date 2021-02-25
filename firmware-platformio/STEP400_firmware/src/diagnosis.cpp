@@ -3,13 +3,18 @@
 // 
 
 #include "diagnosis.h"
-#include <stdarg.h>
 #include "utils.h"
 
+String configVersionCompareString[5] = {
+	F("CONFIG_VERSION_UNDEFINED"),
+	F("CONFIG_VERSION_NOTLOADED"),
+	F("CONFIG_VERSION_OLD"),
+	F("CONFIG_VERSION_APPLICABLE"),
+	F("CONFIG_VERSION_NEW")
+};
 // =============================================================================
 // Diagnosis via USB serial
 // =============================================================================
-
 
 void diagnosisCommand(uint8_t inByte) {
 	switch (inByte)
@@ -17,8 +22,8 @@ void diagnosisCommand(uint8_t inByte) {
 	case 'm':
 		printMenu();
 		break;
-	case 'p':
-		printParameters();
+	case 'c':
+		printConfigulations();
 		break;
 	case 's':
 		printCurrentState();
@@ -28,34 +33,23 @@ void diagnosisCommand(uint8_t inByte) {
 	}
 }
 
-void p_(const __FlashStringHelper* fmt, ...)
-{
-	char buf[128]; // resulting string limited to 128 chars
-	va_list args;
-	va_start(args, fmt);
-#ifdef __AVR__
-	vsnprintf_P(buf, sizeof(buf), (const char*)fmt, args); // progmem for AVR
-#else
-	vsnprintf(buf, sizeof(buf), (const char*)fmt, args); // for the rest of the world
-#endif
-	va_end(args);
-	SerialUSB.print(buf);
-}
-
-#define p(fmt, ...)	 p_(F(fmt), ##__VA_ARGS__)
-
 void printMenu() {
+	printHeader("Diagnosis menu");
 	p("s: show status\n");
-	p("p: show parameters\n");
+	p("c: show config\n");
 }
 
 void printCurrentState() {
 	String s;
 	bool bt;
 	boldHeader("Current Status");
-	p("Firmware name : %s\n", FIRMWARE_NAME);
+	printHeader("Firmware");
+	p("Firmware name : %s\n", firmwareName);
+	p("Firmware version : %d.%d.%d\n",firmwareVersion[0],firmwareVersion[1],firmwareVersion[2]);
 	p("Compile date : %s, %s\n", COMPILE_DATE, COMPILE_TIME);
-
+	p("Applicable config version : %d.%d\n", applicableConfigVersion[0],applicableConfigVersion[1]);
+	p("Loaded config version : %d.%d [%s]\n", loadedConfigVersion[0], loadedConfigVersion[1],
+		configVersionCompareString[checkConfigVersion()].c_str());
 	printHeader("DIP Switch");
 	p("BIN : ");
 	uint8_t t = getMyId();
@@ -206,37 +200,42 @@ void printCurrentState() {
 	show4Bool(F("Current Mode"), isCurrentMode);
 	show4Bool(F("Electromagnetic Brake Enable"),electromagnetBrakeEnable);
 	p("Brake status :\n");
-	String bsText[4] = {"BRAKE_CLOSED","BRAKE_OPEN_WAITING","BRAKE_OPENED","BRAKE_DEEXCITATION_WAITING"};
+	String bsText[4] = {"BRAKE_ENGAGED","BRAKE_DISENGAGE_WAITING","BRAKE_DISENGAGED","BRAKE_MOTORHIZ_WAITING"};
 	for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
 		p("#%d : %s\n",i+1,bsText[brakeStatus[i]].c_str());
 	}
 }
 
-
 #pragma region print_config
-void printParameters() {
-	boldHeader("Parameters");
-	printHeader("Config");
+void printConfigulations() {
+	boldHeader("Configulations");
+	printHeader("Config file");
 	//showBoolResult(F("SD library initialize succeeded"), sdInitializeSucceeded);
-	//showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);
-	//showBoolResult(F("SD config file parse succeeded"), configFileParseSucceeded);
+	showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);
+	showBoolResult(F("SD config file parse succeeded"), configFileParseSucceeded);
+	p("configTargetProduct : %s\n", configTargetProduct.c_str());
 	p("configName : %s\n", configName.c_str());
+	p("config version : %d.%d [%s]\n", loadedConfigVersion[0], loadedConfigVersion[1],
+		configVersionCompareString[checkConfigVersion()].c_str());
 
 	printHeader("Network");
 	showIpAddress(F("My Ip"), myIp);
+	showBoolResult(F("isMyIpAddId"), isMyIpAddId);
 	showIpAddress(F("Dest Ip"), destIp);
 	showIpAddress(F("DNS"), dns);
 	showIpAddress(F("Gateway"), gateway);
 	showIpAddress(F("Subnet mask"), subnet);
-	showBoolResult(F("isMyIpAddId"), isMyIpAddId);
+	p("MAC address : %02X:%02X:%02X:%02X:%02X:%02X\n",mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	showBoolResult(F("isMacAddId"), isMacAddId);
+	p("inPort : %d\n", inPort);
+	p("outPort : %d\n", outPort);
+	showBoolResult(F("isOutPortAddId"), isOutPortAddId);
 	showBoolResult(F("bootedMsgEnable"), bootedMsgEnable);
 	showBoolResult(F("isDestIpSet"), isDestIpSet);
 
 	printHeader("Report & Alarm");
 	show4Bool("reportBUSY", reportBUSY); 
 	show4Bool(F("reportBUSY"), reportBUSY);
-	show4Bool(F("reportFLAG"), reportFLAG);
 	show4Bool(F("reportHiZ"), reportHiZ);
 	show4Bool(F("reportHomeSwStatus"), reportHomeSwStatus);
 	show4Bool(F("reportDir"), reportDir);
@@ -258,6 +257,7 @@ void printParameters() {
 	show4Bool(F("isCurrentMode"), isCurrentMode);
 	print4data("slewRate", slewRateNum);
 	show4Bool(F("electromagnetBrakeEnable"), electromagnetBrakeEnable);
+	print4data(F("brakeTransitionDuration"), brakeTransitionDuration);
 
 	printHeader("speedProfile");
 	print4data("acc", acc);

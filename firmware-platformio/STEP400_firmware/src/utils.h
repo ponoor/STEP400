@@ -13,8 +13,10 @@
 #include <OSCMessage.h>
 #include <Ethernet.h>
 
-uint8_t getMyId();
+char* p_(const __FlashStringHelper* fmt, ...);
+#define p(fmt, ...)	 p_(F(fmt), ##__VA_ARGS__)
 
+uint8_t getMyId();
 
 void turnOnRXL();
 void turnOnTXL();

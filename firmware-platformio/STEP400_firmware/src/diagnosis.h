@@ -10,13 +10,12 @@
 #endif
 
 #include "globals.h"
-
-void p_(const __FlashStringHelper* fmt, ...);
+#include "loadConfig.h"
 
 void diagnosisCommand(uint8_t inByte);
 void printMenu();
 void printCurrentState();
-void printParameters();
+void printConfigulations();
 void printTitle(String title);
 void showBoolResult(String title, bool val);
 template <class T>

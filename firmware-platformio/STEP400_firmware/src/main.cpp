@@ -15,12 +15,19 @@
 #include <ArduinoJson.h> //https://arduinojson.org/
 #include <Adafruit_SleepyDog.h> // https://github.com/adafruit/Adafruit_SleepyDog
 
-#include "globals.h" // Global values and pin mappings
+#include "globals.h" // Global values and pin assigns
 #include "utils.h"  // Utility functions
 #include "oscListeners.h"   // OSC receive
-#include "loadConfig.h" // Load the config file from SD
+#include "loadConfig.h" // Load the config file from the microSD
 #include "diagnosis.h"  // USB serial diagnosis
 
+// General
+
+const char *firmwareName = "STEP400";
+const uint8_t firmwareVersion[3] = {0,6,1};
+const uint8_t applicableConfigVersion[2] = {1,0};
+
+// PowerSTEP01 SPI
 SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins
 
 // Servo mode
@@ -136,6 +143,13 @@ void checkStatus() {
         {
         	busy[i] = t;
         	if ( reportBUSY[i] ) sendTwoData("/busy", i + MOTOR_ID_FIRST, (int32_t)t);
+            if ( busy[i] && (homingStatus[i] == HOMING_RELEASESW) ) {
+                homingStatus[i] = HOMIMG_COMPLETED;
+                if (bHoming[i]) {
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
         }
         // DIR
         t = (status & STATUS_DIR) > 0;
@@ -150,6 +164,16 @@ void checkStatus() {
         {
             homeSwState[i] = t;
             if (reportHomeSwStatus[i]) getHomeSw(i + 1);
+            if (homingStatus[i] = HOMING_GOUNTIL) {
+                if (bHoming[i]) {
+                    releaseSw(i, 0, !homingDirection[i]);
+                    homingStatus[i] = HOMING_RELEASESW;
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                } else {
+                    homingStatus[i] = HOMIMG_COMPLETED;
+                }
+
+            }
         }
         // SW_EVN, active high, latched
         t = (status & STATUS_SW_EVN) > 0;
@@ -159,6 +183,11 @@ void checkStatus() {
         if (motorStatus[i] != t) {
             motorStatus[i] = t;
             if (reportMotorStatus[i]) sendTwoData("/motorStatus", i + MOTOR_ID_FIRST, motorStatus[i]);
+            if (bBrakeDecWaiting[i] && (motorStatus[i] == 0)) // motor stopped
+            {
+                activate(i, false);
+                bBrakeDecWaiting[i] = false;
+            }
         }
         // CMD_ERROR, active high, latched
         t = (status & STATUS_CMD_ERROR) > 0;
@@ -227,21 +256,50 @@ void checkBrake(uint32_t _currentTimeMillis) {
     for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
     {
         if (electromagnetBrakeEnable[i]) {
-            if (brakeStatus[i] == BRAKE_OPEN_WAITING) {
-                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= BRAKE_TRANSITION_DURATION) {
+            if (brakeStatus[i] == BRAKE_DISENGAGE_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
                     digitalWrite(brakePin[i], HIGH);
-                    brakeStatus[i] = BRAKE_OPENED;
+                    brakeStatus[i] = BRAKE_DISENGAGED;
                 }
-            } else if (brakeStatus[i] == BRAKE_DEEXCITATION_WAITING) {
-                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= BRAKE_TRANSITION_DURATION) {
+            } else if (brakeStatus[i] == BRAKE_MOTORHIZ_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
                     stepper[i].hardHiZ();
-                    brakeStatus[i] = BRAKE_CLOSED;
+                    brakeStatus[i] = BRAKE_ENGAGED;
                 }
             }
         }
     }
     
 }
+
+void checkHomingTimeout(uint32_t _currentTimeMillis) {
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+        if ((homingStatus[i] == HOMING_GOUNTIL) && (goUntilTimeout[i] > 0)) {
+            if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= goUntilTimeout[i]) {
+                stepper[i].hardStop();
+                sendTwoData("/error/homing", "GoUntilTimeout", i + MOTOR_ID_FIRST);
+                homingStatus[i] = HOMING_TIMEOUT;
+                if (bHoming[i]) {
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
+        } 
+        else if ((homingStatus[i] == HOMING_RELEASESW) && (releaseSwTimeout[i] > 0)) {
+            if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= releaseSwTimeout[i]) {
+                stepper[i].hardStop();
+                sendTwoData("/error/homing", "ReleaseSwTimeout", i + MOTOR_ID_FIRST);
+                homingStatus[i] = HOMING_TIMEOUT;
+                    if (bHoming[i]) {
+                        sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
+
+        }
+    }
+}
+
 void updateServo(uint32_t currentTimeMicros) {
     static uint32_t lastServoUpdateTime = 0;
     static float eZ1[NUM_OF_MOTOR] = { 0,0,0,0 },
@@ -284,6 +342,7 @@ void loop() {
         checkStatus();
         checkLimitSw();
         checkBrake(currentTimeMillis);
+        checkHomingTimeout(currentTimeMillis);
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();
         if (myId != t) {

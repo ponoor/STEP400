@@ -10,10 +10,11 @@ uint32_t RXL_blinkStartTime, TXL_blinkStartTime;
 
 // Json configuration file
 String configName;
+String configTargetProduct;
 bool sdInitializeSucceeded = false;
 bool configFileOpenSucceeded = false;
 bool configFileParseSucceeded = false;
-
+int8_t loadedConfigVersion[2] = {-1,0};
 // PowerSTEP01
 powerSTEP stepper[] = {
     powerSTEP(3, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN),
@@ -40,13 +41,17 @@ boolean
     isOutPortAddId,
     bootedMsgEnable;
 boolean isWaitingSendBootMsg = false;
-uint8_t brakeStatus[4] = { 0,0,0,0 }; 
-uint32_t brakeTranisitionTrigTime[4];
+uint8_t brakeStatus[NUM_OF_MOTOR] = { 0,0,0,0 }; 
+uint32_t brakeTranisitionTrigTime[NUM_OF_MOTOR];
+bool bBrakeDecWaiting[NUM_OF_MOTOR] = { 0,0,0,0 };
 
+// Homing
+uint32_t homingStartTime[NUM_OF_MOTOR];
+uint8_t homingStatus[NUM_OF_MOTOR] = {0,0,0,0};
+bool bHoming[NUM_OF_MOTOR] = {0,0,0,0};
 // Motor settings
 bool 
     busy[NUM_OF_MOTOR],
-    flag[NUM_OF_MOTOR],
     HiZ[NUM_OF_MOTOR],
     homeSwState[NUM_OF_MOTOR],
     dir[NUM_OF_MOTOR],
@@ -56,7 +61,6 @@ uint8_t
     thermalStatus[NUM_OF_MOTOR];
 bool
     reportBUSY[NUM_OF_MOTOR],
-    reportFLAG[NUM_OF_MOTOR],
     reportHiZ[NUM_OF_MOTOR],
     reportHomeSwStatus[NUM_OF_MOTOR],
     reportDir[NUM_OF_MOTOR],
@@ -69,8 +73,15 @@ bool
     reportStall[NUM_OF_MOTOR],
     limitSwState[NUM_OF_MOTOR],
     reportLimitSwStatus[NUM_OF_MOTOR],
-    limitSwMode[NUM_OF_MOTOR];
-
+    limitSwMode[NUM_OF_MOTOR],
+    homingDirection[NUM_OF_MOTOR],
+    bProhibitMotionOnHomeSw[NUM_OF_MOTOR],
+    bProhibitMotionOnLimitSw[NUM_OF_MOTOR],
+    bHomingAtStartup[NUM_OF_MOTOR];
+float homingSpeed[NUM_OF_MOTOR] = {50.0, 50.0, 50.0, 50.0};
+uint16_t
+    goUntilTimeout[NUM_OF_MOTOR] = {10000,10000,10000,10000},
+    releaseSwTimeout[NUM_OF_MOTOR] = {10000,10000,10000,10000};
 uint8_t kvalHold[NUM_OF_MOTOR], kvalRun[NUM_OF_MOTOR], kvalAcc[NUM_OF_MOTOR], kvalDec[NUM_OF_MOTOR];
 uint8_t tvalHold[NUM_OF_MOTOR], tvalRun[NUM_OF_MOTOR], tvalAcc[NUM_OF_MOTOR], tvalDec[NUM_OF_MOTOR];
 bool isCurrentMode[NUM_OF_MOTOR];
@@ -92,7 +103,8 @@ uint8_t
 uint16_t slewRate[NUM_OF_MOTOR]; // GATECFG1
 uint8_t slewRateNum[NUM_OF_MOTOR]; // [0]114, [1]220, [2]400, [3]520, [4]790, [5]980.
 float lowSpeedOptimize[NUM_OF_MOTOR];
-bool electromagnetBrakeEnable[NUM_OF_MOTOR] = {1,1,1,1};
+bool electromagnetBrakeEnable[NUM_OF_MOTOR];
+uint16_t brakeTransitionDuration[NUM_OF_MOTOR];
 
 float
     acc[NUM_OF_MOTOR],

@@ -14,8 +14,10 @@
 
 void OSCMsgReceive();
 bool isCorrectMotorId(uint8_t motorID);
+bool isBrakeDisEngaged(uint8_t motorID);
+bool checkMotionStartConditions(uint8_t motorID, bool dir);
 
-void excitation(uint8_t motorID, bool state);
+void activate(uint8_t motorID, bool state);
 void free(uint8_t motorID);
 
 // config_commands_osc_listener
@@ -74,6 +76,16 @@ void setDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(uint8_t motorID);
 void enableElectromagnetBrake(OSCMessage& msg, int addrOffset);
+void setGoUntilTimeout(OSCMessage& msg, int addrOffset);
+void getGoUntilTimeout(OSCMessage& msg, int addrOffset);
+void setReleaseSwTimeout(OSCMessage& msg, int addrOffset);
+void getReleaseSwTimeout(OSCMessage& msg, int addrOffset);
+void setHomingDirection(OSCMessage& msg, int addrOffset);
+void getHomingDirection(OSCMessage& msg, int addrOffset);
+void prohibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
+void getProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
+void prohibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
+void getProhibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
 
 //  kval_commands_osc_listener
 void setKval(OSCMessage& msg, int addrOffset);
@@ -123,8 +135,11 @@ void runRaw(OSCMessage& msg, int addrOffset);
 void move(OSCMessage& msg, int addrOffset);
 void goTo(OSCMessage& msg, int addrOffset);
 void goToDir(OSCMessage& msg, int addrOffset);
+void homing(uint8_t motorID);
+void homing(OSCMessage& msg, int addrOffset);
 void goUntil(OSCMessage& msg, int addrOffset);
 void goUntilRaw(OSCMessage& msg, int addrOffset);
+void releaseSw(uint8_t motorID, bool action, bool dir);
 void releaseSw(OSCMessage& msg, int addrOffset);
 void goHome(OSCMessage& msg, int addrOffset);
 void goMark(OSCMessage& msg, int addrOffset);
@@ -135,7 +150,7 @@ void softStop(OSCMessage& msg, int addrOffset);
 void hardStop(OSCMessage& msg, int addrOffset);
 void softHiZ(OSCMessage& msg, int addrOffset);
 void hardHiZ(OSCMessage& msg, int addrOffset);
-void excitation(OSCMessage& msg, int addrOffset);
+void activate(OSCMessage& msg, int addrOffset);
 void free(OSCMessage& msg, int addrOffset);
 
 // servo_commands_osc_listener
@@ -152,14 +167,5 @@ void setVoltageMode(OSCMessage& msg, int addrOffset);
 void setCurrentMode(uint8_t motorID);
 void setCurrentMode(OSCMessage& msg, int addrOffset);
 
-void sendErrorMsg(uint8_t motorID, uint8_t errorNum);
-
-enum {
-	OscSyntaxError = 0,
-	MessageNotMatch,
-	WrongDataType,
-	MotorIdNotMatch,
-	OutOfRange
-};
 #endif
 

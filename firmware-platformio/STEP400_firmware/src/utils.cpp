@@ -3,7 +3,22 @@
 // 
 
 #include "utils.h"
+#include <stdarg.h>
 
+char* p_(const __FlashStringHelper* fmt, ...)
+{
+	char buf[128]; // resulting string limited to 128 chars
+	va_list args;
+	va_start(args, fmt);
+#ifdef __AVR__
+	vsnprintf_P(buf, sizeof(buf), (const char*)fmt, args); // progmem for AVR
+#else
+	vsnprintf(buf, sizeof(buf), (const char*)fmt, args); // for the rest of the world
+#endif
+	va_end(args);
+	SerialUSB.print(buf);
+	return buf;
+}
 
 uint8_t getMyId() {
     uint8_t _id = 0;
@@ -14,7 +29,6 @@ uint8_t getMyId() {
     }
     return _id;
 }
-
 
 void turnOnRXL() {
     digitalWrite(PIN_LED_RXL, LOW); // turn on
