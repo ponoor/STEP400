@@ -1847,7 +1847,7 @@ void goToDir(OSCMessage& msg, int addrOffset) {
 void homing(uint8_t motorID) {
     bHoming[motorID] = true;
     homingStatus[motorID] = HOMING_GOUNTIL;
-    stepper[motorID].goUntil(0,homingDirection[motorID], homingSpeed[motorID]);
+    goUntil(motorID, 0, homingDirection[motorID], homingSpeed[motorID]);
     sendTwoData("/homingStatus",motorID+MOTOR_ID_FIRST, homingStatus[motorID]);
 }
 void homing(OSCMessage& msg, int addrOffset) {
@@ -1863,6 +1863,17 @@ void homing(OSCMessage& msg, int addrOffset) {
     }
 }
 
+void goUntil(uint8_t motorID, bool action, bool dir, float stepsPerSec) {
+    if (isBrakeDisEngaged(motorID)) {
+        if (homeSwState[motorID]) {
+            sendTwoData("/error/command", "HomeSwActivated", motorID+MOTOR_ID_FIRST);
+        } else {
+            stepper[motorID].goUntil(action, dir, stepsPerSec);
+            homingStatus[motorID] = HOMING_GOUNTIL;
+            homingStartTime[motorID] = millis();
+        }
+    }
+}
 void goUntil(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     bool action = getBool(msg, 1);
@@ -1871,27 +1882,11 @@ void goUntil(OSCMessage& msg, int addrOffset) {
     stepsPerSec = fabsf(stepsPerSec);
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        if (isBrakeDisEngaged(motorID)) {
-            if (homeSwState[motorID]) {
-                sendTwoData("/error/command", "HomeSwActivated", motorID+MOTOR_ID_FIRST);
-            } else {
-                stepper[motorID].goUntil(action, dir, stepsPerSec);
-                homingStatus[motorID] = HOMING_GOUNTIL;
-                homingStartTime[motorID] = millis();
-            }
-        }
+        goUntil(motorID, action, dir, stepsPerSec);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            if (isBrakeDisEngaged(i)) {
-                if (homeSwState[i]) {
-                    sendTwoData("/error/command", "HomeSwActivated", i+MOTOR_ID_FIRST);
-                } else {
-                    stepper[i].goUntil(action, dir, stepsPerSec);
-                    homingStatus[i] = HOMING_GOUNTIL;
-                    homingStartTime[i] = millis();
-                }
-            }
+            goUntil(i, action, dir, stepsPerSec);
         }
     } else {
         sendMotorIdError(motorID);

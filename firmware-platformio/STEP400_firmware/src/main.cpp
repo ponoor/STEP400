@@ -143,7 +143,7 @@ void checkStatus() {
         {
         	busy[i] = t;
         	if ( reportBUSY[i] ) sendTwoData("/busy", i + MOTOR_ID_FIRST, (int32_t)t);
-            if ( busy[i] && (homingStatus[i] == HOMING_RELEASESW) ) {
+            if ( (!busy[i]) && (homingStatus[i] == HOMING_RELEASESW) ) {
                 homingStatus[i] = HOMIMG_COMPLETED;
                 if (bHoming[i]) {
                     sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
@@ -164,7 +164,11 @@ void checkStatus() {
         {
             homeSwState[i] = t;
             if (reportHomeSwStatus[i]) getHomeSw(i + 1);
-            if (homingStatus[i] = HOMING_GOUNTIL) {
+        }
+        // SW_EVN, active high, latched
+        t = (status & STATUS_SW_EVN) > 0;
+        if (t) {
+            if (homingStatus[i] == HOMING_GOUNTIL) {
                 if (bHoming[i]) {
                     releaseSw(i, 0, !homingDirection[i]);
                     homingStatus[i] = HOMING_RELEASESW;
@@ -172,12 +176,10 @@ void checkStatus() {
                 } else {
                     homingStatus[i] = HOMIMG_COMPLETED;
                 }
-
             }
+            if (reportSwEvn[i]) sendOneDatum("/swEvent", i + MOTOR_ID_FIRST);
         }
-        // SW_EVN, active high, latched
-        t = (status & STATUS_SW_EVN) > 0;
-        if (t && reportSwEvn[i]) sendOneDatum("/swEvent", i + MOTOR_ID_FIRST);
+        
         // MOT_STATUS
         t = (status & STATUS_MOT_STATUS) >> 5;
         if (motorStatus[i] != t) {

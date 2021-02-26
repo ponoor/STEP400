@@ -137,6 +137,7 @@ void goTo(OSCMessage& msg, int addrOffset);
 void goToDir(OSCMessage& msg, int addrOffset);
 void homing(uint8_t motorID);
 void homing(OSCMessage& msg, int addrOffset);
+void goUntil(uint8_t motorID, bool action, bool dir, float stepsPerSec);
 void goUntil(OSCMessage& msg, int addrOffset);
 void goUntilRaw(OSCMessage& msg, int addrOffset);
 void releaseSw(uint8_t motorID, bool action, bool dir);
