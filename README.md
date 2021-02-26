@@ -1,5 +1,5 @@
 ## STEP400
-![STEP400_proto_r4](http://ponoor.com/manage/wp-content/uploads/2020/09/step400-angled-view.jpg)
+![STEP400](https://ponoor.com/cms/wp-content/uploads/2021/02/step400_r100.jpg)
 
 STEP400 is a 4-axis stepper motor driver designed for art or design projects. STEP400 combines the following elements into one single board:
 
