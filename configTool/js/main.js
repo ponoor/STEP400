@@ -23,7 +23,6 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 
         alarmAndReport: {
             reportBUSY: document.querySelectorAll("input[name='reportBUSY']"),
-            reportFLAG: document.querySelectorAll("input[name='reportFLAG']"),
             reportHiZ: document.querySelectorAll("input[name='reportHiZ']"),
             reportHomeSwStatus: document.querySelectorAll("input[name='reportHomeSwStatus']"),
             reportDir: document.querySelectorAll("input[name='reportDir']"),
@@ -38,9 +37,16 @@ window.addEventListener('DOMContentLoaded', function() {
             OCThreshold: document.querySelectorAll("select[name='OCThreshold']")
         }, 
         driverSettings: {
+            homingAtStartup : document.querySelectorAll("select[name='homingAtStartup']"),
             stepMode: document.querySelectorAll("select[name='stepMode']"),
+            homingSpeed: document.querySelectorAll("select[name='homingSpeed']"),
             homeSwMode: document.querySelectorAll("input[name='homeSwMode']"),
+            prohibitMotionOnHomeSw: document.querySelectorAll("select[name='prohibitMotionOnHomeSw']"),
             limitSwMode: document.querySelectorAll("input[name='limitSwMode']"),
+            prohibitMotionOnLimitSw: document.querySelectorAll("select[name='prohibitMotionOnLimitSw']"),
+            goUnitlTimeout: document.querySelectorAll("select[name='goUnitlTimeout']"),
+            releaseSwTimeout: document.querySelectorAll("select[name='releaseSwTimeout']"),
+            stepMode: document.querySelectorAll("select[name='stepMode']"),
             isCurrentMode: document.querySelectorAll("input[name='isCurrentMode']"),
             slewRate: document.querySelectorAll("select[name='slewRate']"),
             electromagnetBrakeEnable: document.querySelectorAll("input[name='electromagnetBrakeEnable']"),
