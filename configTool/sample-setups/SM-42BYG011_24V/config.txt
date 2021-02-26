@@ -61,12 +61,6 @@
 			false,
 			false
 		],
-		"reportFLAG": [
-			false,
-			false,
-			false,
-			false
-		],
 		"reportHiZ": [
 			false,
 			false,

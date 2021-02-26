@@ -1376,10 +1376,6 @@ void getTval(uint8_t motorID) {
     OSCMessage newMes("/tval");
     newMes.add((int32_t)motorID);
     motorID -= MOTOR_ID_FIRST;
-    //newMes.add((int32_t)stepper[motorID - MOTOR_ID_FIRST].getHoldTVAL());
-    //newMes.add((int32_t)stepper[motorID - MOTOR_ID_FIRST].getRunTVAL());
-    //newMes.add((int32_t)stepper[motorID - MOTOR_ID_FIRST].getAccTVAL());
-    //newMes.add((int32_t)stepper[motorID - MOTOR_ID_FIRST].getDecTVAL());
     newMes.add(tvalHold[motorID]).add(tvalRun[motorID]).add(tvalAcc[motorID]).add(tvalDec[motorID]);
     Udp.beginPacket(destIp, outPort);
     newMes.send(Udp);
