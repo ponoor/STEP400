@@ -52,16 +52,11 @@
 		],
 		"isMacAddId": true,
 		"bootedMsgEnable": true,
-		"canSendMsgBeforeDestIp": false
+		"canSendMsgBeforeDestIp": false,
+		"reportError": true
 	},
 	"alarmAndReport": {
 		"reportBUSY": [
-			false,
-			false,
-			false,
-			false
-		],
-		"reportFLAG": [
 			false,
 			false,
 			false,
@@ -96,12 +91,6 @@
 			false,
 			false,
 			false
-		],
-		"reportCommandError": [
-			true,
-			true,
-			true,
-			true
 		],
 		"reportUVLO": [
 			true,
@@ -141,11 +130,23 @@
 		]
 	},
 	"driverSettings": {
-		"stepMode": [
-			7,
-			7,
-			7,
-			7
+		"homingAtStartup": [
+			false,
+			false,
+			false,
+			false
+		],
+		"homingDirection": [
+			0,
+			0,
+			0,
+			0
+		],
+		"homingSpeed": [
+			50,
+			50,
+			50,
+			50
 		],
 		"homeSwMode": [
 			true,
@@ -153,11 +154,41 @@
 			true,
 			true
 		],
+		"prohibitMotionOnHomeSw": [
+			false,
+			false,
+			false,
+			false
+		],
 		"limitSwMode": [
 			true,
 			true,
 			true,
 			true
+		],
+		"prohibitMotionOnLimitSw": [
+			false,
+			false,
+			false,
+			false
+		],
+		"goUnitlTimeout": [
+			10000,
+			10000,
+			10000,
+			10000
+		],
+		"releaseSwTimeout": [
+			10000,
+			10000,
+			10000,
+			10000
+		],
+		"stepMode": [
+			7,
+			7,
+			7,
+			7
 		],
 		"isCurrentMode": [
 			false,
@@ -212,52 +243,52 @@
 	},
 	"voltageMode": {
 		"KVAL_HOLD": [
-			8,
-			8,
-			8,
-			8
+			54,
+			54,
+			54,
+			54
 		],
 		"KVAL_RUN": [
-			16,
-			16,
-			16,
-			16
+			169,
+			169,
+			169,
+			169
 		],
 		"KVAL_ACC": [
-			16,
-			16,
-			16,
-			16
+			169,
+			169,
+			169,
+			169
 		],
 		"KVAL_DEC": [
-			16,
-			16,
-			16,
-			16
+			169,
+			169,
+			169,
+			169
 		],
 		"INT_SPEED": [
-			1032,
-			1032,
-			1032,
-			1032
+			8070,
+			8070,
+			8070,
+			8070
 		],
 		"ST_SLP": [
-			25,
-			25,
-			25,
-			25
+			52,
+			52,
+			52,
+			52
 		],
 		"FN_SLP_ACC": [
-			41,
-			41,
-			41,
-			41
+			142,
+			142,
+			142,
+			142
 		],
 		"FN_SLP_DEC": [
-			41,
-			41,
-			41,
-			41
+			142,
+			142,
+			142,
+			142
 		],
 		"STALL_TH": [
 			31,
@@ -274,28 +305,28 @@
 	},
 	"currentMode": {
 		"TVAL_HOLD": [
-			0,
-			0,
-			0,
-			0
+			2,
+			2,
+			2,
+			2
 		],
 		"TVAL_RUN": [
-			16,
-			16,
-			16,
-			16
+			4,
+			4,
+			4,
+			4
 		],
 		"TVAL_ACC": [
-			16,
-			16,
-			16,
-			16
+			4,
+			4,
+			4,
+			4
 		],
 		"TVAL_DEC": [
-			16,
-			16,
-			16,
-			16
+			4,
+			4,
+			4,
+			4
 		],
 		"T_FAST": [
 			25,

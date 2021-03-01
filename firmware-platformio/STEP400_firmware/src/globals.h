@@ -82,13 +82,14 @@ extern bool
     isMacAddId,
     isOutPortAddId,
     bootedMsgEnable,
-    isWaitingSendBootMsg;
+    isWaitingSendBootMsg,
+    reportErrors;
 #define BOOT_MSG_WAIT_TIME  1000    //[ms], The waiting duration for sending a boot message after Ethernet has been linked
 
 // Motor settings.
 #define TVAL_LIMIT_VAL  64 // approx. 5A
 
-// brake
+// Brake
 extern uint8_t brakeStatus[NUM_OF_MOTOR];
 enum {
     BRAKE_ENGAGED = 0,
@@ -99,7 +100,7 @@ enum {
 extern uint32_t brakeTranisitionTrigTime[NUM_OF_MOTOR];
 extern bool bBrakeDecWaiting[NUM_OF_MOTOR]; // Waiting deccelaration for the brake engaging procedure
 
-// homing
+// Homing
 extern uint32_t homingStartTime[NUM_OF_MOTOR];
 extern uint8_t homingStatus[NUM_OF_MOTOR];
 extern bool bHoming[NUM_OF_MOTOR];
@@ -110,6 +111,26 @@ enum {
     HOMING_RELEASESW,
     HOMIMG_COMPLETED,
     HOMING_TIMEOUT
+};
+
+// Command errors
+enum {
+    ERROR_COMMAND_IGNORED = 0,
+    ERROR_MOTORID_NOTMATCH,
+    ERROR_BRAKE_ENGAGED,
+    ERROR_HOMESW_ACTIVATING,
+    ERROR_LIMITSW_ACTIVATING,
+    ERROR_GOUNTIL_TIMEOUT,
+    ERROR_RELEASESW_TIMEOUT
+};
+const String commandErrorText[7] = {
+    F("CommandIgnored"),
+    F("MotorIdNotMatch"),
+    F("BrakeEngaged"),
+    F("HomeSwActivating"),
+    F("LimitSwActivating"),
+    F("GoUntilTimeout"),
+    F("ReleaseSwTimeout")
 };
 // These values will be initialized at loadConfig()
 extern bool
@@ -129,7 +150,6 @@ extern bool
     reportDir[NUM_OF_MOTOR],
     reportMotorStatus[NUM_OF_MOTOR],
     reportSwEvn[NUM_OF_MOTOR],
-    reportCommandError[NUM_OF_MOTOR],
     reportUVLO[NUM_OF_MOTOR],
     reportThermalStatus[NUM_OF_MOTOR],
     reportOCD[NUM_OF_MOTOR],

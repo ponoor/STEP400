@@ -71,10 +71,6 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].setHoldKVAL(kvalHold[deviceID]);
         stepper[deviceID].setParam(STALL_TH, stallThreshold[deviceID]);
         stepper[deviceID].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
-        //kvalHold[deviceID] = tvalHold[deviceID] = stepper[deviceID].getHoldKVAL();
-        //kvalRun[deviceID] = tvalRun[deviceID] = stepper[deviceID].getRunKVAL();
-        //kvalAcc[deviceID] = tvalAcc[deviceID] = stepper[deviceID].getAccKVAL();
-        //kvalDec[deviceID] = tvalDec[deviceID] = stepper[deviceID].getDecKVAL();
 
         delay(1);
         stepper[deviceID].getStatus(); // clears error flags
@@ -137,8 +133,10 @@ bool getBool(OSCMessage &msg, uint8_t offset)
     
 }
 
-void sendMotorIdError(uint8_t motorID) {
-    sendTwoData(F("/error/command"),F("MotorIdNotMatch"), motorID);
+void sendCommandError(uint8_t motorID, uint8_t errorNum)
+{
+    if (reportErrors)
+        sendTwoData(F("/error/command"), commandErrorText[errorNum].c_str(), motorID);
 }
 
 void sendThreeInt(String address, int32_t data1, int32_t data2, int32_t data3) {

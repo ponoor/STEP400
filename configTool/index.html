@@ -182,6 +182,14 @@
     </div>
     <div class="input-items"><input type="checkbox" name="canSendMsgBeforeDestIp"></div>
 </li>
+<li>
+    <div class="input-label">
+        <label class="hint">Report errors</label>
+            <p class="tooltip">Enable error messages from STEP400.</p>
+
+    </div>
+    <div class="input-items"><input type="checkbox" name="reportError" checked></div>
+</li>
 </ul>
 
 <div class="heading-wrap">
@@ -216,19 +224,6 @@
 </li>
 <li>
     <div class="input-label">
-        <label class="hint">Report FLAG</label>
-        <p class="tooltip">A notification message will be sent automatically when the FLAG status changes.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="reportFLAG">
-        <input type="checkbox" name="reportFLAG">
-        <input type="checkbox" name="reportFLAG">
-        <input type="checkbox" name="reportFLAG">
-        <input type="checkbox" name="reportFLAG">
-    </div>
-</li>
-<li>
-    <div class="input-label">
         <label class="hint">Report HiZ state</label>
         <p class="tooltip">A notification message will be sent automatically when the HiZ status changes.</p>
     </div>
@@ -251,6 +246,19 @@
         <input type="checkbox" name="reportHomeSwStatus">
         <input type="checkbox" name="reportHomeSwStatus">
         <input type="checkbox" name="reportHomeSwStatus">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Report LIMIT switch status</label>
+        <p class="tooltip">A notification message will be sent automatically when the limit sensor input changes.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
     </div>
 </li>
 <li>
@@ -290,19 +298,6 @@
         <input type="checkbox" name="reportSwEvn">
         <input type="checkbox" name="reportSwEvn">
         <input type="checkbox" name="reportSwEvn">
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Report command error</label>
-        <p class="tooltip">A notification message will be sent automatically when the command error happens.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
     </div>
 </li>
 <li>
@@ -355,19 +350,6 @@
         <input type="checkbox" name="reportStall">
         <input type="checkbox" name="reportStall">
         <input type="checkbox" name="reportStall">
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Report LIMIT switch status</label>
-        <p class="tooltip">A notification message will be sent automatically when the limit sensor input changes.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
     </div>
 </li>
 <li>
@@ -489,6 +471,141 @@
 </li>
 <li>
     <div class="input-label">
+        <label class="hint">Homing when the system starts</label>
+        <p class="tooltip">Start a homing procedure when the system booted.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="homingAtStartup">
+        <input type="checkbox" name="homingAtStartup">
+        <input type="checkbox" name="homingAtStartup">
+        <input type="checkbox" name="homingAtStartup">
+        <input type="checkbox" name="homingAtStartup">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Homing Direction</label>
+        <p class="tooltip">The initial homing direction. This depends on the mechanical structure and the motor wiring.</p>
+    </div>
+    <div class="input-items">
+        <select name="homingDirection">
+            <option value="0" selected="">Reverse</option>
+            <option value="1">Forward</option>
+        </select>
+        <select name="homingDirection">
+            <option value="0" selected="">Reverse</option>
+            <option value="1">Forward</option>
+        </select>
+        <select name="homingDirection">
+            <option value="0" selected="">Reverse</option>
+            <option value="1">Forward</option>
+        </select>
+        <select name="homingDirection">
+            <option value="0" selected="">Reverse</option>
+            <option value="1">Forward</option>
+        </select>
+        <select name="homingDirection">
+            <option value="0" selected="">Reverse</option>
+            <option value="1">Forward</option>
+        </select>
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Homing Speed</label>
+        <p class="tooltip">The initial homing speed.</p>
+    </div>
+    <div class="input-items">
+        <input type="number" name="homingSpeed" min="0" max="15610" value="50" step="1">
+        <input type="number" name="homingSpeed" min="0" max="15610" value="50" step="1">
+        <input type="number" name="homingSpeed" min="0" max="15610" value="50" step="1">
+        <input type="number" name="homingSpeed" min="0" max="15610" value="50" step="1">
+        <input type="number" name="homingSpeed" min="0" max="15610" value="50" step="1">
+        step/s
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Home switch won't cause HardStop</label>
+        <p class="tooltip">If this box is not checked, the home sensor input causes hard stop of the motor.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="homeSwMode" checked>
+        <input type="checkbox" name="homeSwMode" checked>
+        <input type="checkbox" name="homeSwMode" checked>
+        <input type="checkbox" name="homeSwMode" checked>
+        <input type="checkbox" name="homeSwMode" checked>
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Prohibit motions on HomeSw</label>
+        <p class="tooltip">Prohibit motion commands for the homing direction when the home switch activating.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="prohibitMotionOnHomeSw">
+        <input type="checkbox" name="prohibitMotionOnHomeSw">
+        <input type="checkbox" name="prohibitMotionOnHomeSw">
+        <input type="checkbox" name="prohibitMotionOnHomeSw">
+        <input type="checkbox" name="prohibitMotionOnHomeSw">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Limit switch won't cause HardStop</label>
+        <p class="tooltip">If this box is not checked, the limit sensor input causes hard stop of the motor.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="limitSwMode" checked>
+        <input type="checkbox" name="limitSwMode" checked>
+        <input type="checkbox" name="limitSwMode" checked>
+        <input type="checkbox" name="limitSwMode" checked>
+        <input type="checkbox" name="limitSwMode" checked>
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">Prohibit motions on LimitSw</label>
+        <p class="tooltip">Prohibit motion commands for the counter homing direction when the limit switch activating.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="prohibitMotionOnLimitSw">
+        <input type="checkbox" name="prohibitMotionOnLimitSw">
+        <input type="checkbox" name="prohibitMotionOnLimitSw">
+        <input type="checkbox" name="prohibitMotionOnLimitSw">
+        <input type="checkbox" name="prohibitMotionOnLimitSw">
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">/goUntil timeout duration</label>
+        <p class="tooltip">A timeout duration for the "/goUntil" command. Set 0 for disable the timeout.</p>
+    </div>
+    <div class="input-items">
+        <input type="number" name="goUnitlTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="goUnitlTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="goUnitlTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="goUnitlTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="goUnitlTimeout" min="0" max="65535" value="10000" step="1">
+        ms
+    </div>
+</li>
+<li>
+    <div class="input-label">
+        <label class="hint">/releaseSw timeout duration</label>
+        <p class="tooltip">A timeout duration for the "/releaseSw" command. Set 0 for disable the timeout.</p>
+    </div>
+    <div class="input-items">
+        <input type="number" name="releaseSwTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="releaseSwTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="releaseSwTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="releaseSwTimeout" min="0" max="65535" value="10000" step="1">
+        <input type="number" name="releaseSwTimeout" min="0" max="65535" value="10000" step="1">
+        ms
+    </div>
+</li>
+<li>
+    <div class="input-label">
         <label class="hint">Microstepping mode</label>
         <p class="tooltip">Specifies the number of microstep divisions.</p>
     </div>
@@ -543,32 +660,6 @@
             <option value="6">1/64 microstep</option>
             <option value="7" selected>1/128 microstep</option>
         </select>
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Home switch won't cause HardStop</label>
-        <p class="tooltip">If this box is not checked, the home sensor input causes hard stop of the motor.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="homeSwMode" checked>
-        <input type="checkbox" name="homeSwMode" checked>
-        <input type="checkbox" name="homeSwMode" checked>
-        <input type="checkbox" name="homeSwMode" checked>
-        <input type="checkbox" name="homeSwMode" checked>
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Limit switch won't cause HardStop</label>
-        <p class="tooltip">If this box is not checked, the limit sensor input causes hard stop of the motor.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="limitSwMode" checked>
-        <input type="checkbox" name="limitSwMode" checked>
-        <input type="checkbox" name="limitSwMode" checked>
-        <input type="checkbox" name="limitSwMode" checked>
-        <input type="checkbox" name="limitSwMode" checked>
     </div>
 </li>
 <li>

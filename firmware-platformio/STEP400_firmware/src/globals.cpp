@@ -15,6 +15,7 @@ bool sdInitializeSucceeded = false;
 bool configFileOpenSucceeded = false;
 bool configFileParseSucceeded = false;
 int8_t loadedConfigVersion[2] = {-1,0};
+
 // PowerSTEP01
 powerSTEP stepper[] = {
     powerSTEP(3, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN),
@@ -23,7 +24,7 @@ powerSTEP stepper[] = {
     powerSTEP(0, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN)
 };
 // Network
-uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x02, 0x00 },
+uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x05, 0x00 },
 myId = 0;
 IPAddress
     myIp(10, 0, 0, 100),
@@ -39,7 +40,8 @@ boolean
     isMyIpAddId,
     isMacAddId,
     isOutPortAddId,
-    bootedMsgEnable;
+    bootedMsgEnable,
+    reportErrors = true;
 boolean isWaitingSendBootMsg = false;
 uint8_t brakeStatus[NUM_OF_MOTOR] = { 0,0,0,0 }; 
 uint32_t brakeTranisitionTrigTime[NUM_OF_MOTOR];
