@@ -24,7 +24,7 @@ powerSTEP stepper[] = {
     powerSTEP(0, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN)
 };
 // Network
-uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x02, 0x00 },
+uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x05, 0x00 },
 myId = 0;
 IPAddress
     myIp(10, 0, 0, 100),

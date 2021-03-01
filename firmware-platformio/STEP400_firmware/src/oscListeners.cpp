@@ -89,7 +89,6 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getMotorStatus", getMotorStatus);
             bMsgRouted |= msgIN.route("/getThermalStatus", getThermalStatus);
             bMsgRouted |= msgIN.route("/resetMotorDriver", resetMotorDriver);
-            //bMsgRouted |= msgIN.route("/enableFlagReport", enableFlagReport);
             bMsgRouted |= msgIN.route("/enableBusyReport", enableBusyReport);
             bMsgRouted |= msgIN.route("/enableHizReport", enableHizReport);
             bMsgRouted |= msgIN.route("/enableHomeSwReport", enableHomeSwReport);

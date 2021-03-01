@@ -71,10 +71,6 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].setHoldKVAL(kvalHold[deviceID]);
         stepper[deviceID].setParam(STALL_TH, stallThreshold[deviceID]);
         stepper[deviceID].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
-        //kvalHold[deviceID] = tvalHold[deviceID] = stepper[deviceID].getHoldKVAL();
-        //kvalRun[deviceID] = tvalRun[deviceID] = stepper[deviceID].getRunKVAL();
-        //kvalAcc[deviceID] = tvalAcc[deviceID] = stepper[deviceID].getAccKVAL();
-        //kvalDec[deviceID] = tvalDec[deviceID] = stepper[deviceID].getDecKVAL();
 
         delay(1);
         stepper[deviceID].getStatus(); // clears error flags
