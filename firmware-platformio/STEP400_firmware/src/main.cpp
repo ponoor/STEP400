@@ -90,6 +90,14 @@ void setup() {
 
     SerialUSB.begin(9600);
     Watchdog.enable(100);
+
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+    {
+        if ( bHomingAtStartup[i] ) {
+            homing(i);
+        }
+    }
+    
 }
 
 void sendBootMsg(uint32_t _currentTime) {
@@ -163,7 +171,7 @@ void checkStatus() {
         if (homeSwState[i] != t)
         {
             homeSwState[i] = t;
-            if (reportHomeSwStatus[i]) getHomeSw(i + 1);
+            if (reportHomeSwStatus[i]) getHomeSw(i);
         }
         // SW_EVN, active high, latched
         t = (status & STATUS_SW_EVN) > 0;
@@ -193,7 +201,8 @@ void checkStatus() {
         }
         // CMD_ERROR, active high, latched
         t = (status & STATUS_CMD_ERROR) > 0;
-        if (t && reportCommandError[i]) sendOneDatum("/error/command", i + MOTOR_ID_FIRST);
+        if (t) 
+            sendCommandError(i + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
         // UVLO, active low
         t = (status & STATUS_UVLO) == 0;
         if (t != uvloStatus[i])
@@ -279,7 +288,7 @@ void checkHomingTimeout(uint32_t _currentTimeMillis) {
         if ((homingStatus[i] == HOMING_GOUNTIL) && (goUntilTimeout[i] > 0)) {
             if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= goUntilTimeout[i]) {
                 stepper[i].hardStop();
-                sendTwoData("/error/homing", "GoUntilTimeout", i + MOTOR_ID_FIRST);
+                sendCommandError(i + MOTOR_ID_FIRST, ERROR_GOUNTIL_TIMEOUT);
                 homingStatus[i] = HOMING_TIMEOUT;
                 if (bHoming[i]) {
                     sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
@@ -290,7 +299,7 @@ void checkHomingTimeout(uint32_t _currentTimeMillis) {
         else if ((homingStatus[i] == HOMING_RELEASESW) && (releaseSwTimeout[i] > 0)) {
             if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= releaseSwTimeout[i]) {
                 stepper[i].hardStop();
-                sendTwoData("/error/homing", "ReleaseSwTimeout", i + MOTOR_ID_FIRST);
+                sendCommandError(i + MOTOR_ID_FIRST, ERROR_RELEASESW_TIMEOUT);
                 homingStatus[i] = HOMING_TIMEOUT;
                     if (bHoming[i]) {
                         sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
@@ -341,10 +350,10 @@ void loop() {
 
     if ((uint32_t)(currentTimeMillis - lastPollTime) >= STATUS_POLL_PERIOD)
     {
-        checkStatus();
         checkLimitSw();
         checkBrake(currentTimeMillis);
         checkHomingTimeout(currentTimeMillis);
+        checkStatus();
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();
         if (myId != t) {

@@ -12,21 +12,25 @@
 #include "globals.h"
 #include <OSCMessage.h>
 
+// 'motorID' : 1-4, 255
+// 'motorId' : 0-3
+
 void OSCMsgReceive();
 bool isCorrectMotorId(uint8_t motorID);
-bool isBrakeDisEngaged(uint8_t motorID);
-bool checkMotionStartConditions(uint8_t motorID, bool dir);
+bool isBrakeDisEngaged(uint8_t motorId);
+bool checkMotionStartConditions(uint8_t motorId, bool dir);
 
-void activate(uint8_t motorID, bool state);
-void free(uint8_t motorID);
+void activate(uint8_t motorId, bool state);
+void free(uint8_t motorId);
 
 // config_commands_osc_listener
 void setDestIp(OSCMessage& msg, int addrOffset);
 void getVersion(OSCMessage& msg, int addrOffset);
 void getConfigName(OSCMessage& msg, int addrOffset);
-void getConfigRegister(uint8_t deviceID);
+void getConfigRegister(uint8_t deviceId);
 void getConfigRegister(OSCMessage& msg, int addrOffset);
 void resetMotorDriver(OSCMessage& msg, int addrOffset);
+void reportError(OSCMessage& msg, int addrOffset);
 void getAdcVal(OSCMessage& msg, int addrOffset);
 void setBrakeOut(OSCMessage& msg, int addrOffset);
 void resetDev(OSCMessage& msg, int addrOffset);
@@ -37,15 +41,14 @@ void enableLimitSwReport(OSCMessage& msg, int addrOffset);
 void enableDirReport(OSCMessage& msg, int addrOffset);
 void enableMotorStatusReport(OSCMessage& msg, int addrOffset);
 void enableSwEventReport(OSCMessage& msg, int addrOffset);
-void enableCommandErrorReport(OSCMessage& msg, int addrOffset);
 void enableUvloReport(OSCMessage& msg, int addrOffset);
 void enableThermalStatusReport(OSCMessage& msg, int addrOffset);
 void enableOverCurrentReport(OSCMessage& msg, int addrOffset);
 void enableStallReport(OSCMessage& msg, int addrOffset);
 void getHomeSw(OSCMessage& msg, int addrOffset);
-void getHomeSw(uint8_t motorID);
+void getHomeSw(uint8_t motorId);
 void getLimitSw(OSCMessage& msg, int addrOffset);
-void getLimitSw(uint8_t motorID);
+void getLimitSw(uint8_t motorId);
 void getBusy(OSCMessage& msg, int addrOffset);
 void getUvlo(OSCMessage& msg, int addrOffset);
 void getMotorStatus(OSCMessage& msg, int addrOffset);
@@ -58,6 +61,7 @@ void getHomeSwMode(OSCMessage& msg, int addrOffset);
 void setHomeSwMode(OSCMessage& msg, int addrOffset);
 void getLimitSwMode(OSCMessage& msg, int addrOffset);
 void setLimitSwMode(OSCMessage& msg, int addrOffset);
+void getHomingStatus(OSCMessage& msg, int addrOffset); 
 // STALL_TH register is 5bit in PowerSTEP01, 7bit in L6470
 void setStallThreshold(OSCMessage& msg, int addrOffset);
 void getStallThreshold(uint8_t motorId);
@@ -68,20 +72,24 @@ void getOverCurrentThreshold(uint8_t motorId);
 void getOverCurrentThreshold(OSCMessage& msg, int addrOffset);
 void setLowSpeedOptimizeThreshold(OSCMessage& msg, int addrOffset);
 void getLowSpeedOptimizeThreshold(OSCMessage& msg, int addrOffset);
-void getLowSpeedOptimizeThreshold(uint8_t motorID);
+void getLowSpeedOptimizeThreshold(uint8_t motorId);
 void setBemfParam(OSCMessage& msg, int addrOffset);
 void getBemfParam(OSCMessage& msg, int addrOffset);
-void getBemfParam(uint8_t motorID);
+void getBemfParam(uint8_t motorId);
 void setDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(OSCMessage& msg, int addrOffset);
-void getDecayModeParam(uint8_t motorID);
+void getDecayModeParam(uint8_t motorId);
 void enableElectromagnetBrake(OSCMessage& msg, int addrOffset);
+void setBrakeTransitionDuration(OSCMessage& msg, int addrOffset);
+void getBrakeTransitionDuration(OSCMessage& msg, int addrOffset);
 void setGoUntilTimeout(OSCMessage& msg, int addrOffset);
 void getGoUntilTimeout(OSCMessage& msg, int addrOffset);
 void setReleaseSwTimeout(OSCMessage& msg, int addrOffset);
 void getReleaseSwTimeout(OSCMessage& msg, int addrOffset);
 void setHomingDirection(OSCMessage& msg, int addrOffset);
 void getHomingDirection(OSCMessage& msg, int addrOffset);
+void setHomingSpeed(OSCMessage& msg, int addrOffset);
+void getHomingSpeed(OSCMessage& msg, int addrOffset);
 void prohibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
 void getProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
 void prohibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
@@ -94,7 +102,7 @@ void setRunKval(OSCMessage& msg, int addrOffset);
 void setAccKval(OSCMessage& msg, int addrOffset);
 void setDecKval(OSCMessage& msg, int addrOffset);
 void getKval(OSCMessage& msg, int addrOffset);
-void getKval(uint8_t motorID);
+void getKval(uint8_t motorId);
 
 // tval_commands_osc_listener
 void setTval(OSCMessage& msg, int addrOffset);
@@ -103,9 +111,9 @@ void setRunTval(OSCMessage& msg, int addrOffset);
 void setAccTval(OSCMessage& msg, int addrOffset);
 void setDecTval(OSCMessage& msg, int addrOffset);
 void getTval(OSCMessage& msg, int addrOffset);
-void getTval(uint8_t motorID);
+void getTval(uint8_t motorId);
 float TvalToCurrent(uint8_t tval);
-void getTval_mA(uint8_t motorID);
+void getTval_mA(uint8_t motorId);
 void getTval_mA(OSCMessage& msg, int addrOffset);
 
 // speed_commands_osc_listener
@@ -123,9 +131,9 @@ void setAccRaw(OSCMessage& msg, int addrOffset);
 void setDecRaw(OSCMessage& msg, int addrOffset);
 void getSpeed(OSCMessage& msg, int addrOffset);
 void getSpeedProfile(OSCMessage& msg, int addrOffset);
-void getSpeedProfile(uint8_t motorID);
+void getSpeedProfile(uint8_t motorId);
 void getSpeedProfileRaw(OSCMessage& msg, int addrOffset);
-void getSpeedProfileRaw(uint8_t motorID);
+void getSpeedProfileRaw(uint8_t motorId);
 
 // operational_commands_osc_listener
 void getPosition(OSCMessage& msg, int addrOffset);
@@ -135,12 +143,12 @@ void runRaw(OSCMessage& msg, int addrOffset);
 void move(OSCMessage& msg, int addrOffset);
 void goTo(OSCMessage& msg, int addrOffset);
 void goToDir(OSCMessage& msg, int addrOffset);
-void homing(uint8_t motorID);
+void homing(uint8_t motorId);
 void homing(OSCMessage& msg, int addrOffset);
-void goUntil(uint8_t motorID, bool action, bool dir, float stepsPerSec);
+void goUntil(uint8_t motorId, bool action, bool dir, float stepsPerSec);
 void goUntil(OSCMessage& msg, int addrOffset);
 void goUntilRaw(OSCMessage& msg, int addrOffset);
-void releaseSw(uint8_t motorID, bool action, bool dir);
+void releaseSw(uint8_t motorId, bool action, bool dir);
 void releaseSw(OSCMessage& msg, int addrOffset);
 void goHome(OSCMessage& msg, int addrOffset);
 void goMark(OSCMessage& msg, int addrOffset);
@@ -159,13 +167,13 @@ void setTargetPosition(OSCMessage& msg, int addrOffset);
 void setTargetPositionList(OSCMessage& msg, int addrOffset);
 void enableServoMode(OSCMessage& msg, int addrOffset);
 void setServoParam(OSCMessage& msg, int addrOffset);
-void getServoParam(uint8_t motorID);
+void getServoParam(uint8_t motorId);
 void getServoParam(OSCMessage& msg, int addrOffset);
 
 // PowerSTEP01_config_osc_listener
-void setVoltageMode(uint8_t motorID);
+void setVoltageMode(uint8_t motorId);
 void setVoltageMode(OSCMessage& msg, int addrOffset);
-void setCurrentMode(uint8_t motorID);
+void setCurrentMode(uint8_t motorId);
 void setCurrentMode(OSCMessage& msg, int addrOffset);
 
 #endif

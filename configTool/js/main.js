@@ -19,21 +19,21 @@ window.addEventListener('DOMContentLoaded', function() {
             mac: document.querySelectorAll("input[name='mac']"),
             isMacAddId: document.querySelector("input[name='isMacAddId']"),
             bootedMsgEnable: document.querySelector("input[name='bootedMsgEnable']"),
-            canSendMsgBeforeDestIp: document.querySelector("input[name='canSendMsgBeforeDestIp']")
+            canSendMsgBeforeDestIp: document.querySelector("input[name='canSendMsgBeforeDestIp']"),
+            reportError: document.querySelector("input[name='reportError']")
         }, 
         alarmAndReport: {
             reportBUSY: document.querySelectorAll("input[name='reportBUSY']"),
             reportHiZ: document.querySelectorAll("input[name='reportHiZ']"),
             reportHomeSwStatus: document.querySelectorAll("input[name='reportHomeSwStatus']"),
+            reportLimitSwStatus: document.querySelectorAll("input[name='reportLimitSwStatus']"),
             reportDir: document.querySelectorAll("input[name='reportDir']"),
             reportMotorStatus: document.querySelectorAll("input[name='reportMotorStatus']"),
             reportSwEvn: document.querySelectorAll("input[name='reportSwEvn']"),
-            reportCommandError: document.querySelectorAll("input[name='reportCommandError']"),
             reportUVLO: document.querySelectorAll("input[name='reportUVLO']"),
             reportThermalStatus: document.querySelectorAll("input[name='reportThermalStatus']"),
             reportOCD: document.querySelectorAll("input[name='reportOCD']"),
             reportStall: document.querySelectorAll("input[name='reportStall']"),
-            reportLimitSwStatus: document.querySelectorAll("input[name='reportLimitSwStatus']"),
             OCThreshold: document.querySelectorAll("select[name='OCThreshold']")
         }, 
         driverSettings: {

@@ -59,6 +59,7 @@ void loadConfig() {
     isMacAddId = network["isMacAddId"] | true;
     bootedMsgEnable = network["bootedMsgEnable"] | true;
     isDestIpSet = network["canSendMsgBeforeDestIp"] | false;
+    reportErrors = network["reportError"] | true;
 
     // Alarm and Report
     JsonObject alarmAndReport = doc["alarmAndReport"];
@@ -83,7 +84,6 @@ void loadConfig() {
         reportDir[i] = alarmAndReport_reportDir[i] | false;
         reportMotorStatus[i] = alarmAndReport_reportMotorStatus[i] | false;
         reportSwEvn[i] = alarmAndReport_reportSwEvn[i] | false;
-        reportCommandError[i] = alarmAndReport_reportCommandError[i] | true;
         reportUVLO[i] = alarmAndReport_reportUVLO[i] | true;
         reportThermalStatus[i] = alarmAndReport_reportThermalStatus[i] | true;
         reportOCD[i] = alarmAndReport_reportOCD[i] | true;

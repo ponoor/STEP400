@@ -27,7 +27,7 @@ int getInt(OSCMessage &msg, uint8_t offset);
 float getFloat(OSCMessage &msg, uint8_t offset);
 bool getBool(OSCMessage &msg, uint8_t offset);
 
-void sendMotorIdError(uint8_t motorID);
+void sendCommandError(uint8_t motorID, uint8_t errorNum);
 
 template <class T>
 void sendOneDatum(String address, T data) {

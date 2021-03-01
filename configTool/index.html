@@ -182,6 +182,14 @@
     </div>
     <div class="input-items"><input type="checkbox" name="canSendMsgBeforeDestIp"></div>
 </li>
+<li>
+    <div class="input-label">
+        <label class="hint">Report errors</label>
+            <p class="tooltip">Enable error messages from STEP400.</p>
+
+    </div>
+    <div class="input-items"><input type="checkbox" name="reportError" checked></div>
+</li>
 </ul>
 
 <div class="heading-wrap">
@@ -242,6 +250,19 @@
 </li>
 <li>
     <div class="input-label">
+        <label class="hint">Report LIMIT switch status</label>
+        <p class="tooltip">A notification message will be sent automatically when the limit sensor input changes.</p>
+    </div>
+    <div class="input-items">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+        <input type="checkbox" name="reportLimitSwStatus">
+    </div>
+</li>
+<li>
+    <div class="input-label">
         <label class="hint">Report motor direction</label>
         <p class="tooltip">A notification message will be sent automatically when the motor direction changes.</p>
     </div>
@@ -277,19 +298,6 @@
         <input type="checkbox" name="reportSwEvn">
         <input type="checkbox" name="reportSwEvn">
         <input type="checkbox" name="reportSwEvn">
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Report command error</label>
-        <p class="tooltip">A notification message will be sent automatically when the command error happens.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
-        <input type="checkbox" name="reportCommandError" checked>
     </div>
 </li>
 <li>
@@ -342,19 +350,6 @@
         <input type="checkbox" name="reportStall">
         <input type="checkbox" name="reportStall">
         <input type="checkbox" name="reportStall">
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Report LIMIT switch status</label>
-        <p class="tooltip">A notification message will be sent automatically when the limit sensor input changes.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
-        <input type="checkbox" name="reportLimitSwStatus">
     </div>
 </li>
 <li>

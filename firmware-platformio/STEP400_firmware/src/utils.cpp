@@ -137,8 +137,10 @@ bool getBool(OSCMessage &msg, uint8_t offset)
     
 }
 
-void sendMotorIdError(uint8_t motorID) {
-    sendTwoData(F("/error/command"),F("MotorIdNotMatch"), motorID);
+void sendCommandError(uint8_t motorID, uint8_t errorNum)
+{
+    if (reportErrors)
+        sendTwoData(F("/error/command"), commandErrorText[errorNum].c_str(), motorID);
 }
 
 void sendThreeInt(String address, int32_t data1, int32_t data2, int32_t data3) {
