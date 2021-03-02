@@ -168,36 +168,6 @@ bool isCorrectMotorId(uint8_t motorID) {
     return bCorrectId;
 }
 
-bool isBrakeDisEngaged(uint8_t motorId) {
-    bool state = electromagnetBrakeEnable[motorId] && (brakeStatus[motorId] != BRAKE_DISENGAGED);
-    if (state) {
-        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_BRAKE_ENGAGED);
-    }
-    return !state;
-}
-
-void reportError(OSCMessage& msg, int addrOffset) {
-    reportErrors = getBool(msg, 0);
-}
-bool checkMotionStartConditions(uint8_t motorId, bool dir) {
-    if (!isBrakeDisEngaged(motorId)) {
-        return false;
-    }
-    else if (bProhibitMotionOnHomeSw[motorId] && (dir == homingDirection[motorId])) {
-        if (homeSwState[motorId]) {
-            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_HOMESW_ACTIVATING);
-            return false;
-        }
-    }
-    else if (bProhibitMotionOnLimitSw[motorId] && (dir != homingDirection[motorId])) {
-        if (limitSwState[motorId]) {
-            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_LIMITSW_ACTIVATING);
-            return false;
-        }
-    }
-    return true;
-}
-
 bool checkGoToDirection(uint8_t motorId, int32_t targetPos) {
     int32_t diff = stepper[motorId].getPos() - targetPos;
     bool dir = diff > 0;
@@ -300,6 +270,10 @@ void resetDev(OSCMessage& msg, int addrOffset) {
             stepper[i].resetDev();
         }
     }
+}
+
+void reportError(OSCMessage& msg, int addrOffset) {
+    reportErrors = getBool(msg, 0);
 }
 
 void enableBusyReport(OSCMessage& msg, int addrOffset) {
@@ -483,6 +457,18 @@ void getBusy(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             sendTwoData("/busy", i + MOTOR_ID_FIRST, busy[i]);
+        }
+    }
+}
+void getHiZ(OSCMessage& msg, int addrOffset) {
+    if (!isDestIpSet) { return; }
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        sendTwoData("/HiZ", motorID, HiZ[motorID - MOTOR_ID_FIRST]);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            sendTwoData("/HiZ", i + MOTOR_ID_FIRST, HiZ[i]);
         }
     }
 }

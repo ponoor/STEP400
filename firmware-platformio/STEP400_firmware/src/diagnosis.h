@@ -14,6 +14,7 @@
 
 void diagnosisCommand(uint8_t inByte);
 void printMenu();
+void testMotion();
 void printCurrentState();
 void printConfigulations();
 void printTitle(String title);

@@ -28,17 +28,28 @@ void diagnosisCommand(uint8_t inByte) {
 	case 's':
 		printCurrentState();
 		break;
+	case 't':
+		testMotion();
+		break;
 	default:
 		break;
 	}
 }
 
 void printMenu() {
-	printHeader("Diagnosis menu");
+	boldHeader("Diagnosis menu");
 	p("s: show status\n");
 	p("c: show config\n");
+	p("t: test motion\n");
 }
 
+void testMotion() {
+	for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+		if (checkMotionStartConditions(i, dir)) {
+			stepper[i].move(FWD, 25600);
+		}
+	}
+}
 void printCurrentState() {
 	String s;
 	bool bt;
@@ -204,9 +215,10 @@ void printCurrentState() {
 	for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
 		p("#%d : %s\n",i+1,bsText[brakeStatus[i]].c_str());
 	}
+	print4data(F("Homing status"), homingStatus);
 }
 
-#pragma region print_config
+
 void printConfigulations() {
 	boldHeader("Configulations");
 	printHeader("Config file");
@@ -255,10 +267,10 @@ void printConfigulations() {
 	// show4Bool(F("homingDirection(1:FWD,0:REV)"),homingDirection);
 	p("homingDirection(1:FWD,0:REV) : %d, %d, %d, %d\n", homingDirection[0], homingDirection[1], homingDirection[2], homingDirection[3]);
 	print4data(F("homingSpeed"), homingSpeed);
-	show4Bool(F("homeSwMode"), homeSwMode);
-	print4data(F("prohibitMotionOnHomeSw"),bProhibitMotionOnHomeSw);
-	show4Bool(F("limitSwMode"), limitSwMode);
-	print4data(F("prohibitMotionOnLimitSw"),bProhibitMotionOnLimitSw);
+	print4data(F("homeSwMode"), homeSwMode);
+	show4Bool(F("prohibitMotionOnHomeSw"),bProhibitMotionOnHomeSw);
+	print4data(F("limitSwMode"), limitSwMode);
+	show4Bool(F("prohibitMotionOnLimitSw"),bProhibitMotionOnLimitSw);
 	print4data(F("goUntilTimeout"), goUntilTimeout);
 	print4data(F("releaseSwTimeout"), releaseSwTimeout);
 	print4data("microStepMode", microStepMode);
@@ -343,5 +355,3 @@ void boldHeader(String header) {
 void printHeader(String header) {
 	p("-------------- %s --------------\n", header.c_str());
 }
-
-#pragma endregion 

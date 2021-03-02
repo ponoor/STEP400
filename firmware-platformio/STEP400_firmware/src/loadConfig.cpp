@@ -81,6 +81,7 @@ void loadConfig() {
         reportBUSY[i] = alarmAndReport_reportBUSY[i] | false;
         reportHiZ[i] = alarmAndReport_reportHiZ[i] | false;
         reportHomeSwStatus[i] = alarmAndReport_reportHomeSwStatus[i] | false;
+        reportLimitSwStatus[i] = alarmAndReport_reportLimitSwStatus[i] | false;
         reportDir[i] = alarmAndReport_reportDir[i] | false;
         reportMotorStatus[i] = alarmAndReport_reportMotorStatus[i] | false;
         reportSwEvn[i] = alarmAndReport_reportSwEvn[i] | false;
@@ -88,7 +89,6 @@ void loadConfig() {
         reportThermalStatus[i] = alarmAndReport_reportThermalStatus[i] | true;
         reportOCD[i] = alarmAndReport_reportOCD[i] | true;
         reportStall[i] = alarmAndReport_reportStall[i] | true;
-        reportLimitSwStatus[i] = alarmAndReport_reportLimitSwStatus[i] | false;
         overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15;
     }
 

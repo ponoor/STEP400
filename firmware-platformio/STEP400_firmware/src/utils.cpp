@@ -135,8 +135,38 @@ bool getBool(OSCMessage &msg, uint8_t offset)
 
 void sendCommandError(uint8_t motorID, uint8_t errorNum)
 {
-    if (reportErrors)
+    if (reportErrors) {
         sendTwoData(F("/error/command"), commandErrorText[errorNum].c_str(), motorID);
+        if (SerialUSB)
+            p("/error/command %s %d\n", commandErrorText[errorNum].c_str(), motorID);
+    }
+}
+
+bool isBrakeDisEngaged(uint8_t motorId) {
+    bool state = electromagnetBrakeEnable[motorId] && (brakeStatus[motorId] != BRAKE_DISENGAGED);
+    if (state) {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_BRAKE_ENGAGED);
+    }
+    return !state;
+}
+
+bool checkMotionStartConditions(uint8_t motorId, bool dir) {
+    if (!isBrakeDisEngaged(motorId)) {
+        return false;
+    }
+    else if (bProhibitMotionOnHomeSw[motorId] && (dir == homingDirection[motorId])) {
+        if (homeSwState[motorId]) {
+            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_HOMESW_ACTIVATING);
+            return false;
+        }
+    }
+    else if (bProhibitMotionOnLimitSw[motorId] && (dir != homingDirection[motorId])) {
+        if (limitSwState[motorId]) {
+            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_LIMITSW_ACTIVATING);
+            return false;
+        }
+    }
+    return true;
 }
 
 void sendThreeInt(String address, int32_t data1, int32_t data2, int32_t data3) {
