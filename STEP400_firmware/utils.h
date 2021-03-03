@@ -13,27 +13,48 @@
 #include <OSCMessage.h>
 #include <Ethernet.h>
 
+char* p_(const __FlashStringHelper* fmt, ...);
+#define p(fmt, ...)	 p_(F(fmt), ##__VA_ARGS__)
+
 uint8_t getMyId();
 
-
 void turnOnRXL();
-
 void turnOnTXL();
-
 void resetMotorDriver(uint8_t deviceID);
-
-void sendOneInt(String address, int32_t data);
-
-void sendTwoInt(String address, int32_t data1, int32_t data2);
-
 void sendThreeInt(String address, int32_t data1, int32_t data2, int32_t data3);
 
-void sendIdFloat(String address, int32_t id, float data);
+int getInt(OSCMessage &msg, uint8_t offset);
+float getFloat(OSCMessage &msg, uint8_t offset);
+bool getBool(OSCMessage &msg, uint8_t offset);
 
-void sendOneString(String address, const char* data);
+bool isBrakeDisEngaged(uint8_t motorId);
+bool checkMotionStartConditions(uint8_t motorId, bool dir);
+
+void sendCommandError(uint8_t motorID, uint8_t errorNum);
 
 template <class T>
-T sendTwoData(String address, T data1, T data2);
+void sendOneDatum(String address, T data) {
+	if (!isDestIpSet) { return; }
+    OSCMessage newMes(address.c_str());
+    newMes.add(data);;
+    Udp.beginPacket(destIp, outPort);
+    newMes.send(Udp);
+    Udp.endPacket();
+    newMes.empty();
+    turnOnTXL();
+}
+
+template <class T, class U>
+void sendTwoData(String address, T data1, U data2) {
+	if (!isDestIpSet) { return; }
+    OSCMessage newMes(address.c_str());
+    newMes.add(data1).add(data2);
+    Udp.beginPacket(destIp, outPort);
+    newMes.send(Udp);
+    Udp.endPacket();
+    newMes.empty();
+    turnOnTXL();
+}
 
 #endif
 

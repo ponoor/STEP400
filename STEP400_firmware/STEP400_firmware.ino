@@ -1,47 +1,54 @@
 /*
  Name:		STEP400_firmware.ino
 
- target:    Arduino Zero
+ target:    Arduino Zero (Native USB port)
  Created:   2020/12/03 10:24:41
  Author:    kanta
 */
-
+#include <Arduino.h>
 #include "wiring_private.h" // pinPeripheral() function
 #include <SPI.h>
-#include <OSCMessage.h>
 #include <Ethernet.h>
-#include <Ponoor_PowerSTEP01Library.h>
 #include <SD.h>
-#include <ArduinoJson.h>
-#include <Adafruit_SleepyDog.h>
-#include "globals.h" // Global values and pin mappings
+#include <OSCMessage.h> // https://github.com/CNMAT/OSC
+#include <Ponoor_PowerSTEP01Library.h>  // https://github.com/ponoor/Ponoor_PowerSTEP01_Library
+#include <ArduinoJson.h> //https://arduinojson.org/
+#include <Adafruit_SleepyDog.h> // https://github.com/adafruit/Adafruit_SleepyDog
+
+// Local files
+#include "globals.h" // Global values and pin assigns
 #include "utils.h"  // Utility functions
 #include "oscListeners.h"   // OSC receive
-#include "loadConfig.h" // Load the config file from SD
+#include "loadConfig.h" // Load the config file from the microSD
 #include "diagnosis.h"  // USB serial diagnosis
 
+// General
+const char *firmwareName = "STEP400";
+const uint8_t firmwareVersion[3] = {1,0,0};
+const uint8_t applicableConfigVersion[2] = {1,0};
+
+// PowerSTEP01 SPI
 SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins
 
 // Servo mode
-uint32_t lastServoUpdateTime;
 constexpr auto position_tolerance = 0; // steps
 
-// brake
-boolean bTurnOnWaiting[4] = { 0,0,0,0 };
+// for PlatformIO
+void sendBootMsg(uint32_t _currentTime);
+void resetEthernet();
+void sendStatusDebug(String address, int32_t data1, int32_t data2, int32_t data3);
+void checkStatus();
+void checkLimitSw();
+void checkLED(uint32_t _currentTimeMillis);
+void checkBrake(uint32_t _currentTimeMillis);
+void updateServo(uint32_t currentTimeMicros);
 
 void setup() {
 
-    //setUSBPriority();
     pinMode(ledPin, OUTPUT);
     pinMode(SD_CS_PIN, OUTPUT);
     pinMode(W5500_RESET_PIN, OUTPUT);
     pinMode(SD_DETECT_PIN, INPUT_PULLUP);
-
-    for (auto i=0; i < NUM_OF_MOTOR; i++)
-    {
-        pinMode(brakePin[i], OUTPUT);
-    }
-
     pinMode(POWERSTEP_RESET_PIN, OUTPUT);
     pinMode(POWERSTEP_CS_PIN, OUTPUT);
     pinMode(POWERSTEP_MOSI, OUTPUT);
@@ -59,6 +66,7 @@ void setup() {
     powerStepSPI.setDataMode(SPI_MODE3);
     
     loadConfig();
+    
     for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
     {
         stepper[i].SPIPortConnect(&powerStepSPI);
@@ -67,6 +75,10 @@ void setup() {
         delay(5);
         digitalWrite(ledPin, LOW);
         delay(5);
+
+        if (electromagnetBrakeEnable[i]) {    
+            pinMode(brakePin[i], OUTPUT);    
+        }
     }
 
     // Configure W5500
@@ -78,6 +90,14 @@ void setup() {
 
     SerialUSB.begin(9600);
     Watchdog.enable(100);
+
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+    {
+        if ( bHomingAtStartup[i] ) {
+            homing(i);
+        }
+    }
+    
 }
 
 void sendBootMsg(uint32_t _currentTime) {
@@ -99,8 +119,6 @@ void sendBootMsg(uint32_t _currentTime) {
     isWaitingSendBootMsg = false;
 }
 
-
-
 void resetEthernet() {
     digitalWrite(W5500_RESET_PIN, LOW);
     digitalWrite(ledPin, HIGH);
@@ -115,18 +133,6 @@ void resetEthernet() {
     Udp.begin(inPort);
 }
 
-
-
-void sendStatusDebug(String address, int32_t data1, int32_t data2, int32_t data3){
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes(address.c_str());
-    newMes.add(data1).add(data2).add(data3);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-}
-
 void checkStatus() {
     uint32_t t;
     for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
@@ -137,72 +143,86 @@ void checkStatus() {
         if (HiZ[i] != t)
         {
             HiZ[i] = t;
-            if (reportHiZ[i]) sendTwoInt("/HiZ", i + MOTOR_ID_FIRST, t);
-            if (debugMode) sendStatusDebug("/HiZ", i + MOTOR_ID_FIRST, t, status);
+            if (reportHiZ[i]) sendTwoData("/HiZ", i + MOTOR_ID_FIRST, (int32_t)t);
         }
         // BUSY, low for busy
         t = (status & STATUS_BUSY) == 0;
         if (busy[i] != t)
         {
         	busy[i] = t;
-        	if ( reportBUSY[i] ) sendTwoInt("/busy", i + MOTOR_ID_FIRST, t);
-            if (debugMode) sendStatusDebug("/busy", i + MOTOR_ID_FIRST, t, status);
+        	if ( reportBUSY[i] ) sendTwoData("/busy", i + MOTOR_ID_FIRST, (int32_t)t);
+            if ( (!busy[i]) && (homingStatus[i] == HOMING_RELEASESW) ) {
+                homingStatus[i] = HOMIMG_COMPLETED;
+                if (bHoming[i]) {
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
         }
         // DIR
         t = (status & STATUS_DIR) > 0;
         if (dir[i] != t)
         {
             dir[i] = t;
-            if (reportDir[i]) sendTwoInt("/dir", i + MOTOR_ID_FIRST, t);
-            if (debugMode) sendStatusDebug("/dir", i + MOTOR_ID_FIRST, t, status);
+            if (reportDir[i]) sendTwoData("/dir", i + MOTOR_ID_FIRST, (int32_t)t);
         }
         // SW_F, low for open, high for close
         t = (status & STATUS_SW_F) > 0;
         if (homeSwState[i] != t)
         {
             homeSwState[i] = t;
-            if (reportHomeSwStatus[i]) getHomeSw(i + 1);
-            if (debugMode) sendStatusDebug("/homeSw", i + MOTOR_ID_FIRST, t, status);
+            if (reportHomeSwStatus[i]) getHomeSw(i);
         }
         // SW_EVN, active high, latched
         t = (status & STATUS_SW_EVN) > 0;
-        if (t && reportSwEvn[i]) sendOneInt("/swEvent", i + MOTOR_ID_FIRST);
-        if (debugMode && t) sendStatusDebug("/swEvent", i + MOTOR_ID_FIRST, t, status);
+        if (t) {
+            if (homingStatus[i] == HOMING_GOUNTIL) {
+                if (bHoming[i]) {
+                    releaseSw(i, 0, !homingDirection[i]);
+                    homingStatus[i] = HOMING_RELEASESW;
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                } else {
+                    homingStatus[i] = HOMIMG_COMPLETED;
+                }
+            }
+            if (reportSwEvn[i]) sendOneDatum("/swEvent", i + MOTOR_ID_FIRST);
+        }
+        
         // MOT_STATUS
         t = (status & STATUS_MOT_STATUS) >> 5;
         if (motorStatus[i] != t) {
             motorStatus[i] = t;
-            if (reportMotorStatus[i]) sendTwoInt("/motorStatus", i + MOTOR_ID_FIRST, motorStatus[i]);
-            if (debugMode) sendStatusDebug("/motorStatus", i + MOTOR_ID_FIRST, t, status);
+            if (reportMotorStatus[i]) sendTwoData("/motorStatus", i + MOTOR_ID_FIRST, motorStatus[i]);
+            if (bBrakeDecWaiting[i] && (motorStatus[i] == 0)) // motor stopped
+            {
+                activate(i, false);
+                bBrakeDecWaiting[i] = false;
+            }
         }
         // CMD_ERROR, active high, latched
         t = (status & STATUS_CMD_ERROR) > 0;
-        if (t && reportCommandError[i]) sendOneInt("/error/command", i + MOTOR_ID_FIRST);
-        if (debugMode && t) sendStatusDebug("//error/command", i + MOTOR_ID_FIRST, t, status);
+        if (t) 
+            sendCommandError(i + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
         // UVLO, active low
         t = (status & STATUS_UVLO) == 0;
         if (t != uvloStatus[i])
         {
             uvloStatus[i] = !uvloStatus[i];
-            if (reportUVLO[i]) sendTwoInt("/uvlo", i + MOTOR_ID_FIRST, uvloStatus[i]);
-            if (debugMode) sendStatusDebug("/ulvo", i + MOTOR_ID_FIRST, t, status);
+            if (reportUVLO[i]) sendTwoData("/uvlo", i + MOTOR_ID_FIRST, uvloStatus[i]);
         }
         // TH_STATUS
         t = (status & STATUS_TH_STATUS) >> 11;
         if (thermalStatus[i] != t) {
             thermalStatus[i] = t;
-            if (reportThermalStatus[i]) sendTwoInt("/thermalStatus", i + MOTOR_ID_FIRST, thermalStatus[i]);
-            if (debugMode) sendStatusDebug("/thermalStatus", i + MOTOR_ID_FIRST, t, status);
+            if (reportThermalStatus[i]) sendTwoData("/thermalStatus", i + MOTOR_ID_FIRST, thermalStatus[i]);
         }
         // OCD, active low, latched
         t = (status & STATUS_OCD) == 0;
-        if (t && reportOCD[i]) sendOneInt("/overCurrent", i + 1);
-        if (debugMode && t) sendStatusDebug("/overCurrent", i + MOTOR_ID_FIRST, t, status);
+        if (t && reportOCD[i]) sendOneDatum("/overCurrent", i + 1);
 
         // STALL A&B, active low, latched
         t = (status & (STATUS_STALL_A | STATUS_STALL_B)) >> 14;
-        if ((t != 3) && reportStall[i]) sendOneInt("/stall", i + MOTOR_ID_FIRST);
-        if (debugMode && (t != 3)) sendStatusDebug("/stall", i + MOTOR_ID_FIRST, t, status);
+        if ((t != 3) && reportStall[i]) sendOneDatum("/stall", i + MOTOR_ID_FIRST);
     }
 }
 void checkLimitSw() {
@@ -243,7 +263,56 @@ void checkLED(uint32_t _currentTimeMillis) {
     }
 }
 
+void checkBrake(uint32_t _currentTimeMillis) {
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+    {
+        if (electromagnetBrakeEnable[i]) {
+            if (brakeStatus[i] == BRAKE_DISENGAGE_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
+                    digitalWrite(brakePin[i], HIGH);
+                    brakeStatus[i] = BRAKE_DISENGAGED;
+                }
+            } else if (brakeStatus[i] == BRAKE_MOTORHIZ_WAITING) {
+                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
+                    stepper[i].hardHiZ();
+                    brakeStatus[i] = BRAKE_ENGAGED;
+                }
+            }
+        }
+    }
+    
+}
+
+void checkHomingTimeout(uint32_t _currentTimeMillis) {
+    for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+        if ((homingStatus[i] == HOMING_GOUNTIL) && (goUntilTimeout[i] > 0)) {
+            if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= goUntilTimeout[i]) {
+                stepper[i].hardStop();
+                sendCommandError(i + MOTOR_ID_FIRST, ERROR_GOUNTIL_TIMEOUT);
+                homingStatus[i] = HOMING_TIMEOUT;
+                if (bHoming[i]) {
+                    sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
+        } 
+        else if ((homingStatus[i] == HOMING_RELEASESW) && (releaseSwTimeout[i] > 0)) {
+            if ((uint32_t)(_currentTimeMillis - homingStartTime[i]) >= releaseSwTimeout[i]) {
+                stepper[i].hardStop();
+                sendCommandError(i + MOTOR_ID_FIRST, ERROR_RELEASESW_TIMEOUT);
+                homingStatus[i] = HOMING_TIMEOUT;
+                    if (bHoming[i]) {
+                        sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
+                    bHoming[i] = false;
+                }
+            }
+
+        }
+    }
+}
+
 void updateServo(uint32_t currentTimeMicros) {
+    static uint32_t lastServoUpdateTime = 0;
     static float eZ1[NUM_OF_MOTOR] = { 0,0,0,0 },
         eZ2[NUM_OF_MOTOR] = { 0,0,0,0 },
         integral[NUM_OF_MOTOR] = { 0,0,0,0 };
@@ -277,12 +346,14 @@ void loop() {
     uint32_t 
         currentTimeMillis = millis(),
         currentTimeMicros = micros();
-    static uint32_t lastPollTime = 0, oledUpdateTime = 0;
+    static uint32_t lastPollTime = 0;
 
     if ((uint32_t)(currentTimeMillis - lastPollTime) >= STATUS_POLL_PERIOD)
     {
-        checkStatus();
         checkLimitSw();
+        checkBrake(currentTimeMillis);
+        checkHomingTimeout(currentTimeMillis);
+        checkStatus();
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();
         if (myId != t) {
@@ -301,14 +372,3 @@ void loop() {
     OSCMsgReceive();
     updateServo(currentTimeMicros);
 }
-
-
-// =============================================================================
-// =============================================================================
-// =============================================================================
-
-
-// =============================================================================
-// =============================================================================
-
-

@@ -15,15 +15,24 @@ void loadConfig() {
     // Allocate a temporary JsonDocument
     // Don't forget to change the capacity to match your requirements.
     // Use arduinojson.org/v6/assistant to compute the capacity.
-    const size_t capacity = 49 * JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(6) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(6) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(8) + JSON_OBJECT_SIZE(10) + JSON_OBJECT_SIZE(13) + JSON_OBJECT_SIZE(14) + 830;
-    DynamicJsonDocument doc(capacity);
+    DynamicJsonDocument doc(7200); // 6144
     DeserializationError error = deserializeJson(doc, file);
+    if (error) {
+        p("Failed to read file: %s\nUsing default configuration.\n", error.f_str());
+    }
     configFileParseSucceeded = (error == false);
     file.close();
     SD.end();
 
     // Information
-    configName = doc["information"]["configName"] | "Default";
+    JsonObject information = doc["information"];
+    configName = information["configName"] | "Default";
+    if (configFileOpenSucceeded) {
+        for (i=0;i<2; i++) {
+            loadedConfigVersion[i] = information["configVersion"][i] | 0;
+        }
+    }
+    configTargetProduct = information["targetProduct"] | "---";
 
     // Network
     JsonObject network = doc["network"];
@@ -50,11 +59,11 @@ void loadConfig() {
     isMacAddId = network["isMacAddId"] | true;
     bootedMsgEnable = network["bootedMsgEnable"] | true;
     isDestIpSet = network["canSendMsgBeforeDestIp"] | false;
+    reportErrors = network["reportError"] | true;
 
     // Alarm and Report
     JsonObject alarmAndReport = doc["alarmAndReport"];
     JsonArray alarmAndReport_reportBUSY = alarmAndReport["reportBUSY"];
-    JsonArray alarmAndReport_reportFLAG = alarmAndReport["reportFLAG"];
     JsonArray alarmAndReport_reportHiZ = alarmAndReport["reportHiZ"];
     JsonArray alarmAndReport_reportHomeSwStatus = alarmAndReport["reportHomeSwStatus"];
     JsonArray alarmAndReport_reportDir = alarmAndReport["reportDir"];
@@ -70,38 +79,52 @@ void loadConfig() {
     for (i = 0; i < NUM_OF_MOTOR; i++)
     {
         reportBUSY[i] = alarmAndReport_reportBUSY[i] | false;
-        reportFLAG[i] = alarmAndReport_reportFLAG[i] | false;
         reportHiZ[i] = alarmAndReport_reportHiZ[i] | false;
         reportHomeSwStatus[i] = alarmAndReport_reportHomeSwStatus[i] | false;
+        reportLimitSwStatus[i] = alarmAndReport_reportLimitSwStatus[i] | false;
         reportDir[i] = alarmAndReport_reportDir[i] | false;
         reportMotorStatus[i] = alarmAndReport_reportMotorStatus[i] | false;
         reportSwEvn[i] = alarmAndReport_reportSwEvn[i] | false;
-        reportCommandError[i] = alarmAndReport_reportCommandError[i] | true;
         reportUVLO[i] = alarmAndReport_reportUVLO[i] | true;
         reportThermalStatus[i] = alarmAndReport_reportThermalStatus[i] | true;
         reportOCD[i] = alarmAndReport_reportOCD[i] | true;
         reportStall[i] = alarmAndReport_reportStall[i] | true;
-        reportLimitSwStatus[i] = alarmAndReport_reportLimitSwStatus[i] | false;
         overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15;
     }
 
     // Driver settings
     JsonObject driverSettings = doc["driverSettings"];
-    JsonArray driverSettings_stepMode = driverSettings["stepMode"];
+    JsonArray driverSettings_homingAtStartup = driverSettings["homingAtStartup"];
+    JsonArray driverSettings_homingDirection = driverSettings["homingDirection"];
+    JsonArray driverSettings_homingSpeed = driverSettings["homingSpeed"];
     JsonArray driverSettings_homeSwMode = driverSettings["homeSwMode"];
+    JsonArray driverSettings_prohibitMotionOnHomeSw = driverSettings["prohibitMotionOnHomeSw"];
     JsonArray driverSettings_limitSwMode = driverSettings["limitSwMode"];
+    JsonArray driverSettings_prohibitMotionOnLimitSw = driverSettings["prohibitMotionOnLimitSw"];
+    JsonArray driverSettings_goUnitlTimeout = driverSettings["goUnitlTimeout"];
+    JsonArray driverSettings_releaseSwTimeout = driverSettings["releaseSwTimeout"];
+    JsonArray driverSettings_stepMode = driverSettings["stepMode"];
     JsonArray driverSettings_isCurrentMode = driverSettings["isCurrentMode"];
     JsonArray driverSettings_slewRate = driverSettings["slewRate"];
     JsonArray driverSettings_electromagnetBrakeEnable = driverSettings["electromagnetBrakeEnable"];
+    JsonArray driverSettings_brakeTransitionDuration = driverSettings["brakeTransitionDuration"];
     uint16_t slewRateVal[6] = { SR_114V_us, SR_220V_us, SR_400V_us, SR_520V_us, SR_790V_us, SR_980V_us };
     for (i = 0; i < NUM_OF_MOTOR; i++) {
-        microStepMode[i] = driverSettings_stepMode[i] | STEP_SEL_1_128;
+        bHomingAtStartup[i] = driverSettings_homingAtStartup[i] | false;
+        homingDirection[i] = driverSettings_homingDirection[i] | REV;
+        homingSpeed[i] = driverSettings_homingSpeed[i] | 50.0;
         homeSwMode[i] = driverSettings_homeSwMode[i] | true; // true: SW_USER, false: SW_HARDSTOP
+        bProhibitMotionOnHomeSw[i] = driverSettings_prohibitMotionOnHomeSw[i] | false;
         limitSwMode[i] = driverSettings_limitSwMode[i] | true;
+        bProhibitMotionOnLimitSw[i] = driverSettings_prohibitMotionOnLimitSw[i] | false;
+        goUntilTimeout[i] = driverSettings_goUnitlTimeout[i] | 10000;
+        releaseSwTimeout[i] = driverSettings_releaseSwTimeout[i] | 10000;
+        microStepMode[i] = driverSettings_stepMode[i] | STEP_SEL_1_128;
         isCurrentMode[i] = driverSettings_isCurrentMode[i] | false;
         slewRateNum[i] = constrain((driverSettings_slewRate[i] | 5), 0, 5); // default SR_980V_us
         slewRate[i] = slewRateVal[slewRateNum[i]];
         electromagnetBrakeEnable[i] = driverSettings_electromagnetBrakeEnable[i] | false;
+        brakeTransitionDuration[i] = driverSettings_brakeTransitionDuration[i] | 100;
     }
 
     // Speed profile
@@ -170,5 +193,25 @@ void loadConfig() {
         kP[i] = servoMode_kP[i] | 0.06;
         kI[i] = servoMode_kI[i] | 0.0;
         kD[i] = servoMode_kD[i] | 0.0;
+    }
+}
+
+uint8_t checkConfigVersion() {
+    if (loadedConfigVersion[0] == -1) {
+        return CONFIG_VERSION_NOTLOADED;
+    } else if ((loadedConfigVersion[0] == 0) && (loadedConfigVersion[1] == 0)) {
+        return CONFIG_VERSION_UNDEFINED;
+    } else if (loadedConfigVersion[0] > applicableConfigVersion[0]) {
+        return CONFIG_VERSION_NEW;
+    } else if (loadedConfigVersion[0] < applicableConfigVersion[0]) {
+        return CONFIG_VERSION_OLD;
+    } else {
+        if (loadedConfigVersion[1] > applicableConfigVersion[1]) {
+            return CONFIG_VERSION_NEW;
+        } else if (loadedConfigVersion[1] < applicableConfigVersion[1]) {
+            return CONFIG_VERSION_OLD;
+        } else {
+            return CONFIG_VERSION_APPLICABLE;
+        }
     }
 }

@@ -17,8 +17,6 @@
 
 void OSCMsgReceive();
 bool isCorrectMotorId(uint8_t motorID);
-bool isBrakeDisEngaged(uint8_t motorId);
-bool checkMotionStartConditions(uint8_t motorId, bool dir);
 
 void activate(uint8_t motorId, bool state);
 void free(uint8_t motorId);
@@ -32,7 +30,6 @@ void getConfigRegister(OSCMessage& msg, int addrOffset);
 void resetMotorDriver(OSCMessage& msg, int addrOffset);
 void reportError(OSCMessage& msg, int addrOffset);
 void getAdcVal(OSCMessage& msg, int addrOffset);
-void setBrakeOut(OSCMessage& msg, int addrOffset);
 void resetDev(OSCMessage& msg, int addrOffset);
 void enableBusyReport(OSCMessage& msg, int addrOffset);
 void enableHizReport(OSCMessage& msg, int addrOffset);
@@ -50,6 +47,7 @@ void getHomeSw(uint8_t motorId);
 void getLimitSw(OSCMessage& msg, int addrOffset);
 void getLimitSw(uint8_t motorId);
 void getBusy(OSCMessage& msg, int addrOffset);
+void getHiZ(OSCMessage& msg, int addrOffset);
 void getUvlo(OSCMessage& msg, int addrOffset);
 void getMotorStatus(OSCMessage& msg, int addrOffset);
 void getThermalStatus(OSCMessage& msg, int addrOffset);

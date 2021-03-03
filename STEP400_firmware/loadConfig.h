@@ -13,9 +13,16 @@
 #include <SD.h>
 #include <SPI.h>
 #include "globals.h"
+#include "utils.h"
 
 void loadConfig();
-
-
+uint8_t checkConfigVersion();
+enum {
+	CONFIG_VERSION_UNDEFINED = 0,
+	CONFIG_VERSION_NOTLOADED,
+	CONFIG_VERSION_OLD,
+	CONFIG_VERSION_APPLICABLE,
+	CONFIG_VERSION_NEW
+};
 #endif
 

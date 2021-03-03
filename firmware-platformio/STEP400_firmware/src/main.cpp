@@ -1,7 +1,7 @@
 /*
  Name:		STEP400_firmware.ino
 
- target:    Arduino Zero
+ target:    Arduino Zero (Native USB port)
  Created:   2020/12/03 10:24:41
  Author:    kanta
 */
@@ -15,6 +15,7 @@
 #include <ArduinoJson.h> //https://arduinojson.org/
 #include <Adafruit_SleepyDog.h> // https://github.com/adafruit/Adafruit_SleepyDog
 
+// Local files
 #include "globals.h" // Global values and pin assigns
 #include "utils.h"  // Utility functions
 #include "oscListeners.h"   // OSC receive
@@ -22,9 +23,8 @@
 #include "diagnosis.h"  // USB serial diagnosis
 
 // General
-
 const char *firmwareName = "STEP400";
-const uint8_t firmwareVersion[3] = {0,6,2};
+const uint8_t firmwareVersion[3] = {1,0,0};
 const uint8_t applicableConfigVersion[2] = {1,0};
 
 // PowerSTEP01 SPI

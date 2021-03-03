@@ -168,36 +168,6 @@ bool isCorrectMotorId(uint8_t motorID) {
     return bCorrectId;
 }
 
-bool isBrakeDisEngaged(uint8_t motorId) {
-    bool state = electromagnetBrakeEnable[motorId] && (brakeStatus[motorId] != BRAKE_DISENGAGED);
-    if (state) {
-        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_BRAKE_ENGAGED);
-    }
-    return !state;
-}
-
-void reportError(OSCMessage& msg, int addrOffset) {
-    reportErrors = getBool(msg, 0);
-}
-bool checkMotionStartConditions(uint8_t motorId, bool dir) {
-    if (!isBrakeDisEngaged(motorId)) {
-        return false;
-    }
-    else if (bProhibitMotionOnHomeSw[motorId] && (dir == homingDirection[motorId])) {
-        if (homeSwState[motorId]) {
-            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_HOMESW_ACTIVATING);
-            return false;
-        }
-    }
-    else if (bProhibitMotionOnLimitSw[motorId] && (dir != homingDirection[motorId])) {
-        if (limitSwState[motorId]) {
-            sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_LIMITSW_ACTIVATING);
-            return false;
-        }
-    }
-    return true;
-}
-
 bool checkGoToDirection(uint8_t motorId, int32_t targetPos) {
     int32_t diff = stepper[motorId].getPos() - targetPos;
     bool dir = diff > 0;
@@ -249,7 +219,7 @@ void getConfigName(OSCMessage& msg, int addrOffset) {
 }
 
 void getConfigRegister(uint8_t deviceId) {
-    sendTwoData("/configRegister", deviceId, stepper[deviceId].getParam(CONFIG));
+    sendTwoData("/configRegister", deviceId + MOTOR_ID_FIRST, stepper[deviceId].getParam(CONFIG));
 }
 void getConfigRegister(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
@@ -300,6 +270,10 @@ void resetDev(OSCMessage& msg, int addrOffset) {
             stepper[i].resetDev();
         }
     }
+}
+
+void reportError(OSCMessage& msg, int addrOffset) {
+    reportErrors = getBool(msg, 0);
 }
 
 void enableBusyReport(OSCMessage& msg, int addrOffset) {
@@ -464,14 +438,7 @@ void getLimitSw(OSCMessage& msg, int addrOffset) {
     }
 }
 void getLimitSw(uint8_t motorId) {
-    if (!isDestIpSet) { return; }
-    OSCMessage newMes("/limitSw");
-    newMes.add(motorId).add(limitSwState[motorId]).add(dir[motorId]);
-    Udp.beginPacket(destIp, outPort);
-    newMes.send(Udp);
-    Udp.endPacket();
-    newMes.empty();
-    turnOnTXL();
+    sendThreeInt("limitSw", motorId + MOTOR_ID_FIRST, limitSwState[motorId], dir[motorId]);
 }
 
 void getBusy(OSCMessage& msg, int addrOffset) {
@@ -483,6 +450,18 @@ void getBusy(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             sendTwoData("/busy", i + MOTOR_ID_FIRST, busy[i]);
+        }
+    }
+}
+void getHiZ(OSCMessage& msg, int addrOffset) {
+    if (!isDestIpSet) { return; }
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        sendTwoData("/HiZ", motorID, HiZ[motorID - MOTOR_ID_FIRST]);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            sendTwoData("/HiZ", i + MOTOR_ID_FIRST, HiZ[i]);
         }
     }
 }
@@ -639,11 +618,11 @@ void getHomingStatus(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        sendTwoData("/homingStatus", motorID, homingStatus[motorID]);
+        sendTwoData("/homingStatus", motorID + MOTOR_ID_FIRST, homingStatus[motorID]);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            sendTwoData("/homingStatus", i, homingStatus[i]);
+            sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
         }
     }
 }
@@ -898,7 +877,7 @@ void getBrakeTransitionDuration(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        sendTwoData("/brakeTransitionDuration", motorID, brakeTransitionDuration[motorID]);
+        sendTwoData("/brakeTransitionDuration", motorID + MOTOR_ID_FIRST, brakeTransitionDuration[motorID]);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -1725,28 +1704,33 @@ void goToDir(OSCMessage& msg, int addrOffset) {
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
         if (checkMotionStartConditions(motorID, dir)) {
-         stepper[motorID].goToDir(dir, pos);
+            stepper[motorID].goToDir(dir, pos);
         }
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            if (checkMotionStartConditions(i, dir)) {
-                stepper[i].goToDir(dir, pos);
-            }
+            if (checkMotionStartConditions(i, dir) )
+                stepper[i].goToDir(dir, pos);   
         }
     }
 }
 
 void homing(uint8_t motorId) {
-    bHoming[motorId] = true;
-    if (homeSwState[motorId]) {
-        releaseSw(motorId, 0, !homingDirection[motorId]);
-        homingStatus[motorId] = HOMING_RELEASESW;
+    if ( bHoming[motorId] ) {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
+    } else if ( isServoMode[motorId] ) {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_IN_SERVO_MODE);
     } else {
-        goUntil(motorId, 0, homingDirection[motorId], homingSpeed[motorId]);
-        homingStatus[motorId] = HOMING_GOUNTIL;
+        bHoming[motorId] = true;
+        if (homeSwState[motorId]) {
+            releaseSw(motorId, 0, !homingDirection[motorId]);
+            homingStatus[motorId] = HOMING_RELEASESW;
+        } else {
+            goUntil(motorId, 0, homingDirection[motorId], homingSpeed[motorId]);
+            homingStatus[motorId] = HOMING_GOUNTIL;
+        }
+        sendTwoData("/homingStatus",motorId+MOTOR_ID_FIRST, homingStatus[motorId]);
     }
-    sendTwoData("/homingStatus",motorId+MOTOR_ID_FIRST, homingStatus[motorId]);
 }
 void homing(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
