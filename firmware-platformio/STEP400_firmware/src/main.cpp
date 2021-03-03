@@ -1,7 +1,7 @@
 /*
  Name:		STEP400_firmware.ino
 
- target:    Arduino Zero
+ target:    Arduino Zero (Native USB port)
  Created:   2020/12/03 10:24:41
  Author:    kanta
 */
