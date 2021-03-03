@@ -121,16 +121,18 @@ enum {
     ERROR_HOMESW_ACTIVATING,
     ERROR_LIMITSW_ACTIVATING,
     ERROR_GOUNTIL_TIMEOUT,
-    ERROR_RELEASESW_TIMEOUT
+    ERROR_RELEASESW_TIMEOUT,
+    ERROR_IN_SERVO_MODE
 };
-const String commandErrorText[7] = {
+const String commandErrorText[8] = {
     F("CommandIgnored"),
     F("MotorIdNotMatch"),
     F("BrakeEngaged"),
     F("HomeSwActivating"),
     F("LimitSwActivating"),
     F("GoUntilTimeout"),
-    F("ReleaseSwTimeout")
+    F("ReleaseSwTimeout"),
+    F("InServoMode")
 };
 // These values will be initialized at loadConfig()
 extern bool

@@ -152,6 +152,11 @@ bool isBrakeDisEngaged(uint8_t motorId) {
 
 bool checkMotionStartConditions(uint8_t motorId, bool dir) {
     if (!isBrakeDisEngaged(motorId)) {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_BRAKE_ENGAGED);
+        return false;
+    }
+    else if ( isServoMode[motorId] ) {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_IN_SERVO_MODE);
         return false;
     }
     else if (bProhibitMotionOnHomeSw[motorId] && (dir == homingDirection[motorId])) {
