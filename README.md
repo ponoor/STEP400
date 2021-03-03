@@ -14,8 +14,15 @@ Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/e
 
 ## Repository Contents
 ### Firmware
-### Hardware
+These 2 folders contain same codes.
+- [/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/STEP400_firmware) : Arduino Sketch folder
+- [/firmware-platformio/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/firmware-platformio/STEP400_firmware) : PlatformIO folder
 
+### Hardware
+[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle files, BOM lists, and schematics PDFs
+
+### Others
+[/configTool](https://github.com/ponoor/STEP400/tree/master/configTool) : The configuration tool consists of a html and JavaScritpts.
 
 ## Firmware dependency
 - **[OSC Library](https://github.com/CNMAT/OSC)** from CNMAT
