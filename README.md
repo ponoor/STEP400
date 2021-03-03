@@ -19,7 +19,7 @@ These 2 folders contain same codes.
 - [/firmware-platformio/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/firmware-platformio/STEP400_firmware) : PlatformIO folder
 
 ### Hardware
-[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle files and BOM lists
+[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle files, BOM lists, and schematics PDFs
 
 ### Others
 [/configTool](https://github.com/ponoor/STEP400/tree/master/configTool) : The configuration tool consists of a html and JavaScritpts.
