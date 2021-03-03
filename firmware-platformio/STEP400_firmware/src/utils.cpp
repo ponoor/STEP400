@@ -152,7 +152,6 @@ bool isBrakeDisEngaged(uint8_t motorId) {
 
 bool checkMotionStartConditions(uint8_t motorId, bool dir) {
     if (!isBrakeDisEngaged(motorId)) {
-        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_BRAKE_ENGAGED);
         return false;
     }
     else if ( isServoMode[motorId] ) {
