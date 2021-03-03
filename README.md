@@ -1,5 +1,5 @@
 ## STEP400
-![STEP400_proto_r4](http://ponoor.com/manage/wp-content/uploads/2020/09/step400-angled-view.jpg)
+![STEP400](https://ponoor.com/cms/wp-content/uploads/2021/02/step400_r100.jpg)
 
 STEP400 is a 4-axis stepper motor driver designed for art or design projects. STEP400 combines the following elements into one single board:
 
@@ -14,8 +14,12 @@ Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/e
 
 ## Repository Contents
 ### Firmware
-### Hardware
+These 2 folders contain same codes.
+- [/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/STEP400_firmware) : Arduino Sketch folder
+- [/firmware-platformio/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/firmware-platformio/STEP400_firmware) : PlatformIO folder
 
+### Hardware
+[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle files and a BOM
 
 ## Firmware dependency
 - **[OSC Library](https://github.com/CNMAT/OSC)** from CNMAT
