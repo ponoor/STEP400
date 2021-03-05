@@ -85,6 +85,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/reportError", reportError);
             bMsgRouted |= msgIN.route("/getHomeSw", getHomeSw);
             bMsgRouted |= msgIN.route("/getBusy", getBusy);
+            bMsgRouted |= msgIN.route("/getHiZ", getHiZ);
             bMsgRouted |= msgIN.route("/getUvlo", getUvlo);
             bMsgRouted |= msgIN.route("/getMotorStatus", getMotorStatus);
             bMsgRouted |= msgIN.route("/getThermalStatus", getThermalStatus);
@@ -99,7 +100,6 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/enableThermalStatusReport", enableThermalStatusReport);
             bMsgRouted |= msgIN.route("/enableOverCurrentReport", enableOverCurrentReport);
             bMsgRouted |= msgIN.route("/enableStallReport", enableStallReport);
-            //bMsgRouted |= msgIN.route("/getDir", getDir);
             bMsgRouted |= msgIN.route("/getLimitSw", getLimitSw);
             bMsgRouted |= msgIN.route("/getLimitSwMode", getLimitSwMode);
             bMsgRouted |= msgIN.route("/setLimitSwMode", setLimitSwMode);
@@ -107,7 +107,6 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/enableElectromagnetBrake", enableElectromagnetBrake);
             bMsgRouted |= msgIN.route("/setBrakeTransitionDuration", setBrakeTransitionDuration);
             bMsgRouted |= msgIN.route("/getBrakeTransitionDuration", getBrakeTransitionDuration);
-
             bMsgRouted |= msgIN.route("/setMicrostepMode", setMicrostepMode);
             bMsgRouted |= msgIN.route("/getMicrostepMode", getMicrostepMode);
             bMsgRouted |= msgIN.route("/getHomeSwMode", getHomeSwMode);
@@ -118,7 +117,6 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getOverCurrentThreshold", getOverCurrentThreshold);
             bMsgRouted |= msgIN.route("/setLowSpeedOptimizeThreshold", setLowSpeedOptimizeThreshold);
             bMsgRouted |= msgIN.route("/getLowSpeedOptimizeThreshold", getLowSpeedOptimizeThreshold);
-
 
             bMsgRouted |= msgIN.route("/setSpeedProfileRaw", setSpeedProfileRaw);
             bMsgRouted |= msgIN.route("/setMaxSpeedRaw", setMaxSpeedRaw);
@@ -144,9 +142,9 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/setHomingSpeed", setHomingSpeed);
             bMsgRouted |= msgIN.route("/getHomingSpeed", getHomingSpeed);
             bMsgRouted |= msgIN.route("/getHomingStatus", getHomingStatus);
-            bMsgRouted |= msgIN.route("/prohibitMotionOnHomeSw", prohibitMotionOnHomeSw);
+            bMsgRouted |= msgIN.route("/setProhibitMotionOnHomeSw", setProhibitMotionOnHomeSw);
             bMsgRouted |= msgIN.route("/getProhibitMotionOnHomeSw", getProhibitMotionOnHomeSw);
-            bMsgRouted |= msgIN.route("/prohibitMotionOnLimitSw", prohibitMotionOnLimitSw);
+            bMsgRouted |= msgIN.route("/setProhibitMotionOnLimitSw", setProhibitMotionOnLimitSw);
             bMsgRouted |= msgIN.route("/getProhibitMotionOnLimitSw", getProhibitMotionOnLimitSw);
 
             turnOnRXL();
@@ -986,7 +984,7 @@ void getHomingSpeed(OSCMessage& msg, int addrOffset) {
     }
 }
 
-void prohibitMotionOnHomeSw(OSCMessage& msg, int addrOffset) {
+void setProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     bool dir = getBool(msg, 1);
     if(isCorrectMotorId(motorID)) {
@@ -1010,7 +1008,7 @@ void getProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset) {
         }
     }
 }
-void prohibitMotionOnLimitSw(OSCMessage& msg, int addrOffset) {
+void setProhibitMotionOnLimitSw(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     bool dir = getBool(msg, 1);
     if(isCorrectMotorId(motorID)) {
