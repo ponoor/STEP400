@@ -12,12 +12,20 @@
 #include <Ponoor_PowerSTEP01Library.h>
 #include <Ethernet.h>
 
+#define PROTOTYPE_R4
+
 // =============================================================================
 // Pin definitions
 // =============================================================================
 #define ledPin	13u
 
+#ifdef PROTOTYPE_R4
+const uint8_t dipSwPin[8] = { A5,SCL,7u,SDA,2u,9u,3u,0u }; // Prototype_r4
+const uint8_t limitSwPin[4] = { 1u,5u,8u,A1 };
+#else
 const uint8_t dipSwPin[8] = { 7u,30u,A5,31u,2u,9u,3u,0u };
+#endif
+
 #define SD_CS_PIN	4u
 
 const uint8_t brakePin[4] = { A1,8u,5u,1u };
