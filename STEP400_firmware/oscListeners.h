@@ -88,9 +88,9 @@ void setHomingDirection(OSCMessage& msg, int addrOffset);
 void getHomingDirection(OSCMessage& msg, int addrOffset);
 void setHomingSpeed(OSCMessage& msg, int addrOffset);
 void getHomingSpeed(OSCMessage& msg, int addrOffset);
-void prohibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
+void setProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
 void getProhibitMotionOnHomeSw(OSCMessage& msg, int addrOffset);
-void prohibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
+void setProhibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
 void getProhibitMotionOnLimitSw(OSCMessage& msg, int addrOffset);
 
 //  kval_commands_osc_listener

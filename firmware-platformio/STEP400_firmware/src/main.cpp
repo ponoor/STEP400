@@ -23,7 +23,11 @@
 #include "diagnosis.h"  // USB serial diagnosis
 
 // General
+#ifdef PROTOTYPE_R4
+const char *firmwareName = "STEP400_PROTO_R4";
+#else
 const char *firmwareName = "STEP400";
+#endif
 const uint8_t firmwareVersion[3] = {1,0,0};
 const uint8_t applicableConfigVersion[2] = {1,0};
 
@@ -75,10 +79,13 @@ void setup() {
         delay(5);
         digitalWrite(ledPin, LOW);
         delay(5);
-
+#ifndef PROTOTYPE_R4
         if (electromagnetBrakeEnable[i]) {    
             pinMode(brakePin[i], OUTPUT);    
         }
+#else
+        pinMode(limitSwPin[i], INPUT_PULLUP);
+#endif
     }
 
     // Configure W5500
@@ -228,7 +235,12 @@ void checkStatus() {
 void checkLimitSw() {
     for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
     {
-        bool t = (stepper[i].getParam(ADC_OUT) < 15);
+        bool t;
+        #ifndef PROTOTYPE_R4
+        t = (stepper[i].getParam(ADC_OUT) < 15);
+        #else
+        t = !digitalRead(limitSwPin[i]);
+        #endif
         if ( limitSwState[i] != t )
         {
             limitSwState[i] = !limitSwState[i];
@@ -269,7 +281,9 @@ void checkBrake(uint32_t _currentTimeMillis) {
         if (electromagnetBrakeEnable[i]) {
             if (brakeStatus[i] == BRAKE_DISENGAGE_WAITING) {
                 if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
+                    #ifndef PROTOTYPE_R4
                     digitalWrite(brakePin[i], HIGH);
+                    #endif
                     brakeStatus[i] = BRAKE_DISENGAGED;
                 }
             } else if (brakeStatus[i] == BRAKE_MOTORHIZ_WAITING) {

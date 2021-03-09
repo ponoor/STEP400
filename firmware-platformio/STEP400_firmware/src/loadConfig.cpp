@@ -123,7 +123,11 @@ void loadConfig() {
         isCurrentMode[i] = driverSettings_isCurrentMode[i] | false;
         slewRateNum[i] = constrain((driverSettings_slewRate[i] | 5), 0, 5); // default SR_980V_us
         slewRate[i] = slewRateVal[slewRateNum[i]];
+        #ifdef PROTOTYPE_R4
+        electromagnetBrakeEnable[i] = false;
+        #else
         electromagnetBrakeEnable[i] = driverSettings_electromagnetBrakeEnable[i] | false;
+        #endif
         brakeTransitionDuration[i] = driverSettings_brakeTransitionDuration[i] | 100;
     }
 

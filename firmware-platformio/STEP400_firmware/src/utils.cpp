@@ -133,12 +133,12 @@ bool getBool(OSCMessage &msg, uint8_t offset)
     
 }
 
-void sendCommandError(uint8_t motorID, uint8_t errorNum)
+void sendCommandError(uint8_t motorId, uint8_t errorNum)
 {
     if (reportErrors) {
-        sendTwoData(F("/error/command"), commandErrorText[errorNum].c_str(), motorID);
+        sendTwoData(F("/error/command"), commandErrorText[errorNum].c_str(), motorId);
         if (SerialUSB)
-            p("/error/command %s %d\n", commandErrorText[errorNum].c_str(), motorID);
+            p("/error/command %s %d\n", commandErrorText[errorNum].c_str(), motorId);
     }
 }
 
