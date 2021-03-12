@@ -1174,7 +1174,7 @@ void getKval(uint8_t motorID) {
 
 #pragma region tval_commands_osc_listener
 void setTval(uint8_t motorId, uint8_t hold, uint8_t run, uint8_t acc, uint8_t dec) {            motorId -= MOTOR_ID_FIRST;
-    if (!isCurrentMode[motorId]) {
+    if (isCurrentMode[motorId]) {
         stepper[motorId].setHoldTVAL(hold);
         stepper[motorId].setRunTVAL(run);
         stepper[motorId].setAccTVAL(acc);
