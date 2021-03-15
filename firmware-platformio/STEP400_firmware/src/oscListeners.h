@@ -78,6 +78,7 @@ void getBemfParam(uint8_t motorId);
 void setDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(OSCMessage& msg, int addrOffset);
 void getDecayModeParam(uint8_t motorId);
+void enableElectromagnetBrake(uint8_t motorId, bool bEnable);
 void enableElectromagnetBrake(OSCMessage& msg, int addrOffset);
 void setBrakeTransitionDuration(OSCMessage& msg, int addrOffset);
 void getBrakeTransitionDuration(OSCMessage& msg, int addrOffset);
