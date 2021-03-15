@@ -85,6 +85,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/reportError", reportError);
             bMsgRouted |= msgIN.route("/getHomeSw", getHomeSw);
             bMsgRouted |= msgIN.route("/getBusy", getBusy);
+            bMsgRouted |= msgIN.route("/getDir", getDir);
             bMsgRouted |= msgIN.route("/getHiZ", getHiZ);
             bMsgRouted |= msgIN.route("/getUvlo", getUvlo);
             bMsgRouted |= msgIN.route("/getMotorStatus", getMotorStatus);
@@ -448,6 +449,18 @@ void getBusy(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             sendTwoData("/busy", i + MOTOR_ID_FIRST, busy[i]);
+        }
+    }
+}
+void getDir(OSCMessage& msg, int addrOffset) {
+    if (!isDestIpSet) { return; }
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        sendTwoData("/dir", motorID, dir[motorID - MOTOR_ID_FIRST]);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            sendTwoData("/dir", i + MOTOR_ID_FIRST, HiZ[i]);
         }
     }
 }

@@ -15,8 +15,8 @@ for (let i = 0; i < length; i++) {
     };
 }
 
-// hexadecimal -> decimal
-function convert() {
+// mac address hexadecimal -> decimal
+function dec() {
     let val = document.querySelectorAll("input[name='mac']");
     val.forEach(function(elem){
         let hex = elem.value;
@@ -25,9 +25,30 @@ function convert() {
     });
 }
 
+function hex() {
+    let val = document.querySelectorAll("input[name='mac']");
+    val.forEach(function(elem){
+        let decimal = parseInt(elem.value);
+        let hex = decimal.toString(16).toUpperCase();
+        elem.value = hex;
+    });
+}
+
 window.onload = function () {
     let elmbtn = document.getElementById('btn');
     elmbtn.onclick = function () {
-      convert();
-    };
+        if (this.checked == true) {
+            hex();
+        } else {
+            dec();
+        }
+    }
+
+    let expbtn = document.getElementById('export');
+    expbtn.onclick = function () {
+        if (elmbtn.checked == true) {
+            elmbtn.checked = false;
+            dec();
+        }
+    }
 }

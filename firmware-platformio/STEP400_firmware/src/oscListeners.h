@@ -47,6 +47,7 @@ void getHomeSw(uint8_t motorId);
 void getLimitSw(OSCMessage& msg, int addrOffset);
 void getLimitSw(uint8_t motorId);
 void getBusy(OSCMessage& msg, int addrOffset);
+void getDir(OSCMessage& msg, int addrOffset);
 void getHiZ(OSCMessage& msg, int addrOffset);
 void getUvlo(OSCMessage& msg, int addrOffset);
 void getMotorStatus(OSCMessage& msg, int addrOffset);
