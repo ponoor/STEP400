@@ -1,5 +1,5 @@
 ## STEP400
-![STEP400](https://ponoor.com/cms/wp-content/uploads/2021/02/step400_r100.jpg)
+![STEP400](https://ponoor.com/cms/wp-content/uploads/2021/03/step400-product-version-edited.png)
 
 STEP400 is a 4-axis stepper motor driver designed for art or design projects. STEP400 combines the following elements into one single board:
 
@@ -12,6 +12,9 @@ The current firmware is focused on working with [Open Sound Control](http://open
 
 Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/en/motor-drivers/powerstep01.html) which provide most of functionalities as a stepper driver.
 
+## Documentation
+https://ponoor.com/en/docs/step400/
+
 ## Repository Contents
 ### Firmware
 These 2 folders contain same codes.
@@ -19,7 +22,7 @@ These 2 folders contain same codes.
 - [/firmware-platformio/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/firmware-platformio/STEP400_firmware) : PlatformIO folder
 
 ### Hardware
-[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle files, BOM lists, and schematics PDFs
+[/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle design files, BOM lists, and schematics PDFs
 
 ### Others
 [/configTool](https://github.com/ponoor/STEP400/tree/master/configTool) : The configuration tool consists of a html and JavaScritpts.
@@ -54,5 +57,4 @@ https://github.com/ponoor/step-series-example-TouchDesigner
 
 Contribution of [@loveandsheep](https://github.com/loveandsheep)
 
-## Documentation
-https://ponoor.com/en/docs/step400/
+
