@@ -77,6 +77,11 @@ void resetMotorDriver(uint8_t deviceID) {
     }
 }
 
+void sendWrongDataTypeError() {
+    if (reportErrors)
+        sendOneDatum(F("/error/osc"),"WrongDataType");
+}
+
 int getInt(OSCMessage &msg, uint8_t offset) 
 {
 	int msgVal = 0;
@@ -89,7 +94,7 @@ int getInt(OSCMessage &msg, uint8_t offset)
 		msgVal = msg.getInt(offset);
 	}
     else {
-        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+        sendWrongDataTypeError();
     }
 	return msgVal;
 }
@@ -106,7 +111,7 @@ float getFloat(OSCMessage &msg, uint8_t offset)
 		msgVal = msg.getInt(offset);
 	}
     else {
-        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+        sendWrongDataTypeError();
     }
 	return msgVal;
 }
@@ -127,7 +132,7 @@ bool getBool(OSCMessage &msg, uint8_t offset)
         msgVal = msg.getBoolean(offset);
     }
     else {
-        sendOneDatum(F("/error/osc"),F("WrongDataType"));
+        sendWrongDataTypeError();
     }
 	return msgVal;
     

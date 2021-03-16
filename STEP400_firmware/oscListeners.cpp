@@ -85,6 +85,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/reportError", reportError);
             bMsgRouted |= msgIN.route("/getHomeSw", getHomeSw);
             bMsgRouted |= msgIN.route("/getBusy", getBusy);
+            bMsgRouted |= msgIN.route("/getDir", getDir);
             bMsgRouted |= msgIN.route("/getHiZ", getHiZ);
             bMsgRouted |= msgIN.route("/getUvlo", getUvlo);
             bMsgRouted |= msgIN.route("/getMotorStatus", getMotorStatus);
@@ -261,10 +262,13 @@ void getAdcVal(OSCMessage& msg, int addrOffset) {
 void resetDev(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
-        stepper[motorID - MOTOR_ID_FIRST].resetDev();
+        motorID -= MOTOR_ID_FIRST;
+        stepper[motorID].hardHiZ();
+        stepper[motorID].resetDev();
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            stepper[i].hardHiZ();
             stepper[i].resetDev();
         }
     }
@@ -448,6 +452,18 @@ void getBusy(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             sendTwoData("/busy", i + MOTOR_ID_FIRST, busy[i]);
+        }
+    }
+}
+void getDir(OSCMessage& msg, int addrOffset) {
+    if (!isDestIpSet) { return; }
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        sendTwoData("/dir", motorID, dir[motorID - MOTOR_ID_FIRST]);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            sendTwoData("/dir", i + MOTOR_ID_FIRST, HiZ[i]);
         }
     }
 }
@@ -841,19 +857,25 @@ void getDecayModeParam(uint8_t motorId) {
     turnOnTXL();
 }
 
+void enableElectromagnetBrake(uint8_t motorId, bool bEnable) {
+    electromagnetBrakeEnable[motorId] = bEnable;
+    if (bEnable) {
+        pinMode(brakePin[motorId], OUTPUT);
+    } else {
+        digitalWrite(brakePin[motorId], LOW);
+    }
+}
 void enableElectromagnetBrake(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     bool bEnable = getBool(msg, 1);
     #ifndef PROTOTYPE_R4
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        electromagnetBrakeEnable[motorID] = bEnable;
-        if (bEnable) pinMode(brakePin[motorID], OUTPUT);
+        enableElectromagnetBrake(motorID, bEnable);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            electromagnetBrakeEnable[i] = bEnable;
-            if (bEnable) pinMode(brakePin[i], OUTPUT);
+            enableElectromagnetBrake(i, bEnable);
         }
     }
     #endif
@@ -1173,8 +1195,8 @@ void getKval(uint8_t motorID) {
 #pragma endregion kval_commands_osc_listener
 
 #pragma region tval_commands_osc_listener
-void setTval(uint8_t motorId, uint8_t hold, uint8_t run, uint8_t acc, uint8_t dec) {            motorId -= MOTOR_ID_FIRST;
-    if (!isCurrentMode[motorId]) {
+void setTval(uint8_t motorId, uint8_t hold, uint8_t run, uint8_t acc, uint8_t dec) {
+    if (isCurrentMode[motorId]) {
         stepper[motorId].setHoldTVAL(hold);
         stepper[motorId].setRunTVAL(run);
         stepper[motorId].setAccTVAL(acc);
@@ -2006,6 +2028,8 @@ void activate(uint8_t motorId, bool state) {
                 brakeTranisitionTrigTime[motorId] = millis();
             }    
         }
+    } else {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
     }
 }
 void activate(OSCMessage& msg, int addrOffset) {    
@@ -2028,6 +2052,8 @@ void free(uint8_t motorId) {
         #endif
         stepper[motorId].hardHiZ();
         brakeStatus[motorId] = BRAKE_DISENGAGED;
+    } else {
+        sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
     }
 }
 void free(OSCMessage& msg, int addrOffset) {
@@ -2145,7 +2171,7 @@ void getServoParam(OSCMessage& msg, int addrOffset) {
 #pragma region PowerSTEP01_config_osc_listener
 
 void setVoltageMode(uint8_t motorId) {
-    stepper[motorId].hardHiZ();
+    //stepper[motorId].hardHiZ();
     stepper[motorId].setPWMFreq(PWM_DIV_1, PWM_MUL_0_75);
     stepper[motorId].setHoldKVAL(kvalHold[motorId]);
     stepper[motorId].setRunKVAL(kvalRun[motorId]);
@@ -2171,7 +2197,7 @@ void setVoltageMode(OSCMessage& msg, int addrOffset) {
 }
 
 void setCurrentMode(uint8_t motorId) {
-    stepper[motorId].hardHiZ();
+    //stepper[motorId].hardHiZ();
     stepper[motorId].setPredictiveControl(CONFIG_PRED_ENABLE);
     stepper[motorId].setSwitchingPeriod(5);
     if (stepper[motorId].getStepMode() > STEP_SEL_1_16)
