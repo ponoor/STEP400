@@ -62,14 +62,14 @@
 	}
 ,
 	"voltageMode" : 	{
-		"KVAL_HOLD" : [ 5, 5, 5, 5 ],
-		"KVAL_RUN" : [ 9, 9, 9, 9 ],
-		"KVAL_ACC" : [ 9, 9, 9, 9 ],
-		"KVAL_DEC" : [ 9, 9, 9, 9 ],
+		"KVAL_HOLD" : [ 7, 7, 7, 7 ],
+		"KVAL_RUN" : [ 14, 14, 14, 14 ],
+		"KVAL_ACC" : [ 14, 14, 14, 14 ],
+		"KVAL_DEC" : [ 14, 14, 14, 14 ],
 		"INT_SPEED" : [ 5722, 5722, 5722, 5722 ],
-		"ST_SLP" : [ 6, 6, 6, 6 ],
-		"FN_SLP_ACC" : [ 16, 16, 16, 16 ],
-		"FN_SLP_DEC" : [ 16, 16, 16, 16 ],
+		"ST_SLP" : [ 9, 9, 9, 9 ],
+		"FN_SLP_ACC" : [ 24, 24, 24, 24 ],
+		"FN_SLP_DEC" : [ 24, 24, 24, 24 ],
 		"STALL_TH" : [ 31, 31, 31, 31 ],
 		"lowSpeedOptimize" : [ 20, 20, 20, 20 ]
 	}
