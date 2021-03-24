@@ -1,0 +1,93 @@
+{
+	"information" : 	{
+		"configName" : "PKP246D23_72V",
+		"configVersion" : [ 1, 0 ],
+		"targetProduct" : "STEP400"
+	}
+,
+	"network" : 	{
+		"myIp" : [ 10, 0, 0, 100 ],
+		"isMyIpAddId" : 1,
+		"destIp" : [ 10, 0, 0, 10 ],
+		"dns" : [ 10, 0, 0, 1 ],
+		"gateway" : [ 10, 0, 0, 1 ],
+		"subnet" : [ 255, 255, 255, 0 ],
+		"inPort" : 50000,
+		"outPort" : 50100,
+		"isOutPortAddId" : 1,
+		"mac" : [ 96, 149, 206, 16, 2, 0 ],
+		"isMacAddId" : 1,
+		"bootedMsgEnable" : 1,
+		"canSendMsgBeforeDestIp" : 0,
+		"reportError" : 1
+	}
+,
+	"alarmAndReport" : 	{
+		"reportBUSY" : [ 0, 0, 0, 0 ],
+		"reportHiZ" : [ 0, 0, 0, 0 ],
+		"reportHomeSwStatus" : [ 0, 0, 0, 0 ],
+		"reportLimitSwStatus" : [ 0, 0, 0, 0 ],
+		"reportDir" : [ 0, 0, 0, 0 ],
+		"reportMotorStatus" : [ 0, 0, 0, 0 ],
+		"reportSwEvn" : [ 0, 0, 0, 0 ],
+		"reportUVLO" : [ 1, 1, 1, 1 ],
+		"reportThermalStatus" : [ 1, 1, 1, 1 ],
+		"reportOCD" : [ 1, 1, 1, 1 ],
+		"reportStall" : [ 0, 0, 0, 0 ],
+		"OCThreshold" : [ 15, 15, 15, 15 ]
+	}
+,
+	"driverSettings" : 	{
+		"homingAtStartup" : [ 0, 0, 0, 0 ],
+		"homingDirection" : [ 0, 0, 0, 0 ],
+		"homingSpeed" : [ 50, 50, 50, 50 ],
+		"homeSwMode" : [ 1, 1, 1, 1 ],
+		"prohibitMotionOnHomeSw" : [ 0, 0, 0, 0 ],
+		"limitSwMode" : [ 1, 1, 1, 1 ],
+		"prohibitMotionOnLimitSw" : [ 0, 0, 0, 0 ],
+		"goUnitlTimeout" : [ 10000, 10000, 10000, 10000 ],
+		"releaseSwTimeout" : [ 10000, 10000, 10000, 10000 ],
+		"stepMode" : [ 7, 7, 7, 7 ],
+		"isCurrentMode" : [ 0, 0, 0, 0 ],
+		"slewRate" : [ 5, 5, 5, 5 ],
+		"electromagnetBrakeEnable" : [ 0, 0, 0, 0 ],
+		"brakeTransitionDuration" : [ 100, 100, 100, 100 ]
+	}
+,
+	"speedProfile" : 	{
+		"acc" : [ 2000, 2000, 2000, 2000 ],
+		"dec" : [ 2000, 2000, 2000, 2000 ],
+		"maxSpeed" : [ 1100, 1100, 1100, 1100 ],
+		"fullStepSpeed" : [ 15625, 15625, 15625, 15625 ]
+	}
+,
+	"voltageMode" : 	{
+		"KVAL_HOLD" : [ 6, 6, 6, 6 ],
+		"KVAL_RUN" : [ 11, 11, 11, 11 ],
+		"KVAL_ACC" : [ 11, 11, 11, 11 ],
+		"KVAL_DEC" : [ 11, 11, 11, 11 ],
+		"INT_SPEED" : [ 4531, 4531, 4531, 4531 ],
+		"ST_SLP" : [ 9, 9, 9, 9 ],
+		"FN_SLP_ACC" : [ 25, 25, 25, 25 ],
+		"FN_SLP_DEC" : [ 25, 25, 25, 25 ],
+		"STALL_TH" : [ 31, 31, 31, 31 ],
+		"lowSpeedOptimize" : [ 20, 20, 20, 20 ]
+	}
+,
+	"currentMode" : 	{
+		"TVAL_HOLD" : [ 15, 15, 15, 15 ],
+		"TVAL_RUN" : [ 29, 29, 29, 29 ],
+		"TVAL_ACC" : [ 29, 29, 29, 29 ],
+		"TVAL_DEC" : [ 29, 29, 29, 29 ],
+		"T_FAST" : [ 25, 25, 25, 25 ],
+		"TON_MIN" : [ 41, 41, 41, 41 ],
+		"TOFF_MIN" : [ 41, 41, 41, 41 ]
+	}
+,
+	"servoMode" : 	{
+		"kP" : [ 0.06, 0.06, 0.06, 0.06 ],
+		"kI" : [ 0, 0, 0, 0 ],
+		"kD" : [ 0, 0, 0, 0 ]
+	}
+
+}

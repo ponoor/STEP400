@@ -50,3 +50,4 @@ STEP400_firmware/Release/board.buildinfo
 *.db-wal
 *.opendb
 *.ipch
+*.code-workspace
