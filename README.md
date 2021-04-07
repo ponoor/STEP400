@@ -35,7 +35,7 @@ These 2 folders contain same codes.
 
 ## Examples
 ### Max
-https://github.com/kanta/STEP400_prototype/blob/master/rev4/STEP400_proto_r4.maxpat
+https://github.com/ponoor/step-series-example-Max
 
 ### Processing
 https://github.com/yuskegoto/STEP400_Processing
@@ -56,5 +56,3 @@ Contribution of [@niimi](https://github.com/niimi)
 https://github.com/ponoor/step-series-example-TouchDesigner
 
 Contribution of [@loveandsheep](https://github.com/loveandsheep)
-
-
