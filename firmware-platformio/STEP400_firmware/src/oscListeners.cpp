@@ -2015,7 +2015,7 @@ void activate(uint8_t motorId, bool state) {
             }
             stepper[motorId].hardStop();
             brakeStatus[motorId] = BRAKE_DISENGAGE_WAITING;
-            brakeTranisitionTrigTime[motorId] = millis();
+            brakeTransitionTrigTime[motorId] = millis();
         }
         else if ((brakeStatus[motorId] == BRAKE_DISENGAGED) || (brakeStatus[motorId] == BRAKE_DISENGAGE_WAITING)) {
             if (state) { // from /free state
@@ -2025,7 +2025,7 @@ void activate(uint8_t motorId, bool state) {
                 digitalWrite(brakePin[motorId], LOW);
                 #endif
                 brakeStatus[motorId] = BRAKE_MOTORHIZ_WAITING;
-                brakeTranisitionTrigTime[motorId] = millis();
+                brakeTransitionTrigTime[motorId] = millis();
             }    
         }
     } else {

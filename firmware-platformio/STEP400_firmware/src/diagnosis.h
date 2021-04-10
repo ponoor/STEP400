@@ -16,7 +16,7 @@ void diagnosisCommand(uint8_t inByte);
 void printMenu();
 void testMotion();
 void printCurrentState();
-void printConfigulations();
+void printConfigurations();
 void printTitle(String title);
 void showBoolResult(String title, bool val);
 template <class T>

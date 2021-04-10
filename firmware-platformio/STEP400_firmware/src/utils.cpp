@@ -3,6 +3,7 @@
 // 
 
 #include "utils.h"
+#include "oscListeners.h"
 #include <stdarg.h>
 
 char* p_(const __FlashStringHelper* fmt, ...)
@@ -49,7 +50,7 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].configStepMode(microStepMode[deviceID]);
         stepper[deviceID].setMaxSpeed(maxSpeed[deviceID]);
         stepper[deviceID].setLoSpdOpt(true);
-        stepper[deviceID].setMinSpeed(lowSpeedOptimize[deviceID]); // Low speed optimazation threshold
+        stepper[deviceID].setMinSpeed(lowSpeedOptimize[deviceID]); // Low speed optimization threshold
         stepper[deviceID].setFullSpeed(fullStepSpeed[deviceID]);
         stepper[deviceID].setParam(INT_SPD, intersectSpeed[deviceID]);
         stepper[deviceID].setParam(ST_SLP, startSlope[deviceID]);
@@ -71,6 +72,7 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].setHoldKVAL(kvalHold[deviceID]);
         stepper[deviceID].setParam(STALL_TH, stallThreshold[deviceID]);
         stepper[deviceID].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
+        if ( isCurrentMode[deviceID] ) setCurrentMode(deviceID);
 
         delay(1);
         stepper[deviceID].getStatus(); // clears error flags

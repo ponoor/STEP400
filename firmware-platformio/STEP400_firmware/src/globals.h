@@ -105,8 +105,8 @@ enum {
     BRAKE_DISENGAGED,
     BRAKE_MOTORHIZ_WAITING // brake closed
 };
-extern uint32_t brakeTranisitionTrigTime[NUM_OF_MOTOR];
-extern bool bBrakeDecWaiting[NUM_OF_MOTOR]; // Waiting deccelaration for the brake engaging procedure
+extern uint32_t brakeTransitionTrigTime[NUM_OF_MOTOR];
+extern bool bBrakeDecWaiting[NUM_OF_MOTOR]; // Waiting deceleration for the brake engaging procedure
 
 // Homing
 extern uint32_t homingStartTime[NUM_OF_MOTOR];
@@ -117,7 +117,7 @@ enum {
     HOMING_UNDEFINED = 0,
     HOMING_GOUNTIL,
     HOMING_RELEASESW,
-    HOMIMG_COMPLETED,
+    HOMING_COMPLETED,
     HOMING_TIMEOUT
 };
 
