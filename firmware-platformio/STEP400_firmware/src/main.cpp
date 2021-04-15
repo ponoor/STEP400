@@ -159,7 +159,7 @@ void checkStatus() {
         	busy[i] = t;
         	if ( reportBUSY[i] ) sendTwoData("/busy", i + MOTOR_ID_FIRST, (int32_t)t);
             if ( (!busy[i]) && (homingStatus[i] == HOMING_RELEASESW) ) {
-                homingStatus[i] = HOMIMG_COMPLETED;
+                homingStatus[i] = HOMING_COMPLETED;
                 if (bHoming[i]) {
                     sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
                     bHoming[i] = false;
@@ -189,7 +189,7 @@ void checkStatus() {
                     homingStatus[i] = HOMING_RELEASESW;
                     sendTwoData("/homingStatus", i + MOTOR_ID_FIRST, homingStatus[i]);
                 } else {
-                    homingStatus[i] = HOMIMG_COMPLETED;
+                    homingStatus[i] = HOMING_COMPLETED;
                 }
             }
             if (reportSwEvn[i]) sendOneDatum("/swEvent", i + MOTOR_ID_FIRST);
@@ -280,14 +280,14 @@ void checkBrake(uint32_t _currentTimeMillis) {
     {
         if (electromagnetBrakeEnable[i]) {
             if (brakeStatus[i] == BRAKE_DISENGAGE_WAITING) {
-                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
+                if ((uint32_t)(_currentTimeMillis - brakeTransitionTrigTime[i]) >= brakeTransitionDuration[i]) {
                     #ifndef PROTOTYPE_R4
                     digitalWrite(brakePin[i], HIGH);
                     #endif
                     brakeStatus[i] = BRAKE_DISENGAGED;
                 }
             } else if (brakeStatus[i] == BRAKE_MOTORHIZ_WAITING) {
-                if ((uint32_t)(_currentTimeMillis - brakeTranisitionTrigTime[i]) >= brakeTransitionDuration[i]) {
+                if ((uint32_t)(_currentTimeMillis - brakeTransitionTrigTime[i]) >= brakeTransitionDuration[i]) {
                     stepper[i].hardHiZ();
                     brakeStatus[i] = BRAKE_ENGAGED;
                 }

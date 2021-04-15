@@ -69,7 +69,7 @@ void loadConfig() {
     JsonArray alarmAndReport_reportDir = alarmAndReport["reportDir"];
     JsonArray alarmAndReport_reportMotorStatus = alarmAndReport["reportMotorStatus"];
     JsonArray alarmAndReport_reportSwEvn = alarmAndReport["reportSwEvn"];
-    JsonArray alarmAndReport_reportCommandError = alarmAndReport["reportCommandError"];
+    //JsonArray alarmAndReport_reportCommandError = alarmAndReport["reportCommandError"];
     JsonArray alarmAndReport_reportUVLO = alarmAndReport["reportUVLO"];
     JsonArray alarmAndReport_reportThermalStatus = alarmAndReport["reportThermalStatus"];
     JsonArray alarmAndReport_reportOCD = alarmAndReport["reportOCD"];
