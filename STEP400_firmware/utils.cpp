@@ -3,6 +3,7 @@
 // 
 
 #include "utils.h"
+#include "oscListeners.h"
 #include <stdarg.h>
 
 char* p_(const __FlashStringHelper* fmt, ...)
@@ -49,12 +50,8 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].configStepMode(microStepMode[deviceID]);
         stepper[deviceID].setMaxSpeed(maxSpeed[deviceID]);
         stepper[deviceID].setLoSpdOpt(true);
-        stepper[deviceID].setMinSpeed(lowSpeedOptimize[deviceID]); // Low speed optimazation threshold
+        stepper[deviceID].setMinSpeed(lowSpeedOptimize[deviceID]); // Low speed optimization threshold
         stepper[deviceID].setFullSpeed(fullStepSpeed[deviceID]);
-        stepper[deviceID].setParam(INT_SPD, intersectSpeed[deviceID]);
-        stepper[deviceID].setParam(ST_SLP, startSlope[deviceID]);
-        stepper[deviceID].setParam(FN_SLP_ACC, accFinalSlope[deviceID]);
-        stepper[deviceID].setParam(FN_SLP_DEC, decFinalSlope[deviceID]);
         stepper[deviceID].setAcc(acc[deviceID]);
         stepper[deviceID].setDec(dec[deviceID]);
         stepper[deviceID].setSlewRate(slewRate[deviceID]);
@@ -65,10 +62,25 @@ void resetMotorDriver(uint8_t deviceID) {
         stepper[deviceID].setOCThreshold(overCurrentThreshold[deviceID]); // 5A for 0.1ohm shunt resistor
         stepper[deviceID].setOCShutdown(OC_SD_ENABLE);
         stepper[deviceID].setOscMode(EXT_16MHZ_OSCOUT_INVERT);
-        stepper[deviceID].setRunKVAL(kvalRun[deviceID]);
-        stepper[deviceID].setAccKVAL(kvalAcc[deviceID]);
-        stepper[deviceID].setDecKVAL(kvalDec[deviceID]);
-        stepper[deviceID].setHoldKVAL(kvalHold[deviceID]);
+        if (isCurrentMode[deviceID]) {
+            stepper[deviceID].setHoldTVAL(tvalHold[deviceID]);
+            stepper[deviceID].setRunTVAL(tvalRun[deviceID]);
+            stepper[deviceID].setAccTVAL(tvalAcc[deviceID]);
+            stepper[deviceID].setDecTVAL(tvalDec[deviceID]);
+            stepper[deviceID].setParam(T_FAST, fastDecaySetting[deviceID]);
+            stepper[deviceID].setParam(TON_MIN, minOnTime[deviceID]);
+            stepper[deviceID].setParam(TOFF_MIN, minOffTime[deviceID]);
+            setCurrentMode(deviceID);
+        } else {
+            stepper[deviceID].setRunKVAL(kvalRun[deviceID]);
+            stepper[deviceID].setAccKVAL(kvalAcc[deviceID]);
+            stepper[deviceID].setDecKVAL(kvalDec[deviceID]);
+            stepper[deviceID].setHoldKVAL(kvalHold[deviceID]);
+            stepper[deviceID].setParam(INT_SPD, intersectSpeed[deviceID]);
+            stepper[deviceID].setParam(ST_SLP, startSlope[deviceID]);
+            stepper[deviceID].setParam(FN_SLP_ACC, accFinalSlope[deviceID]);
+            stepper[deviceID].setParam(FN_SLP_DEC, decFinalSlope[deviceID]);
+        }
         stepper[deviceID].setParam(STALL_TH, stallThreshold[deviceID]);
         stepper[deviceID].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
 

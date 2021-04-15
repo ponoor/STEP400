@@ -23,7 +23,7 @@ void diagnosisCommand(uint8_t inByte) {
 		printMenu();
 		break;
 	case 'c':
-		printConfigulations();
+		printConfigurations();
 		break;
 	case 's':
 		printCurrentState();
@@ -130,7 +130,7 @@ void printCurrentState() {
 			showBoolResult(F("\tHigh impedance state"), bt);
 			showBoolResult(F("\tBUSY"), !(status[i] & STATUS_BUSY));
 			bt = (status[i] & STATUS_DIR) > 0;
-			s = (bt ? "Foward" : "Reverse");
+			s = (bt ? "Forward" : "Reverse");
 			p("\tMotor direction : %s\n", s.c_str());
 			t = (status[i] & STATUS_MOT_STATUS) >> 5;
 			switch (t)
@@ -219,8 +219,8 @@ void printCurrentState() {
 }
 
 
-void printConfigulations() {
-	boldHeader("Configulations");
+void printConfigurations() {
+	boldHeader("Configurations");
 	printHeader("Config file");
 	//showBoolResult(F("SD library initialize succeeded"), sdInitializeSucceeded);
 	showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);

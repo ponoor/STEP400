@@ -28,7 +28,7 @@ const char *firmwareName = "STEP400_PROTO_R4";
 #else
 const char *firmwareName = "STEP400";
 #endif
-const uint8_t firmwareVersion[3] = {1,0,0};
+const uint8_t firmwareVersion[3] = {1,0,1};
 const uint8_t applicableConfigVersion[2] = {1,0};
 
 // PowerSTEP01 SPI
