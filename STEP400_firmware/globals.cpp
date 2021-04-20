@@ -44,7 +44,7 @@ boolean
     reportErrors = true;
 boolean isWaitingSendBootMsg = false;
 uint8_t brakeStatus[NUM_OF_MOTOR] = { 0,0,0,0 }; 
-uint32_t brakeTranisitionTrigTime[NUM_OF_MOTOR];
+uint32_t brakeTransitionTrigTime[NUM_OF_MOTOR];
 bool bBrakeDecWaiting[NUM_OF_MOTOR] = { 0,0,0,0 };
 
 // Homing
