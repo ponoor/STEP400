@@ -15,6 +15,8 @@ Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/e
 ## Documentation
 https://ponoor.com/en/docs/step400/
 
+Forum: https://github.com/ponoor/step-series-forum/discussions
+
 ## Repository Contents
 ### Firmware
 These 2 folders contain same codes.
