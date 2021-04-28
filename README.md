@@ -57,7 +57,7 @@ Contribution of [@niimi](https://github.com/niimi)
 ### Touch Designer
 https://github.com/ponoor/step-series-example-TouchDesigner
 
-Contribution of [@loveandsheep](https://github.com/loveandsheep)
+Contribution of [@loveandsheep](https://github.com/loveandsheep) and [@yuskegoto](https://github.com/yuskegoto)
 
 ### Node-RED
 https://github.com/yuskegoto/STEP400_Node-RED
