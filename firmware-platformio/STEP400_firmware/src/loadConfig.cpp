@@ -91,8 +91,8 @@ void loadConfig() {
         reportUVLO[i] = alarmAndReport_reportUVLO[i] | true;
         reportThermalStatus[i] = alarmAndReport_reportThermalStatus[i] | true;
         reportOCD[i] = alarmAndReport_reportOCD[i] | true;
-        reportStall[i] = alarmAndReport_reportStall[i] | true;
-        overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15;
+        reportStall[i] = alarmAndReport_reportStall[i] | false;
+        overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15; // 15=5A
     }
 
     // Driver settings
