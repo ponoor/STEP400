@@ -12,7 +12,7 @@
 #include <Ponoor_PowerSTEP01Library.h>
 #include <Ethernet.h>
 
-//#define PROTOTYPE_R4 // Uncomment this line for the prototype r4 pcb.
+// #define PROTOTYPE_R4 // Uncomment this line for the prototype r4 pcb.
 
 // =============================================================================
 // Pin definitions
