@@ -24,15 +24,18 @@ powerSTEP stepper[] = {
     powerSTEP(0, POWERSTEP_CS_PIN, POWERSTEP_RESET_PIN)
 };
 // Network
-uint8_t mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x05, 0x00 },
-myId = 0;
+uint8_t 
+    mac[] = { 0x60, 0x95, 0xCE, 0x10, 0x05, 0x00 },
+    mac_from_config[],
+    myId = 0;
 IPAddress
     myIp(10, 0, 0, 100),
+    myIp_from_config,
     destIp(10, 0, 0, 10),
     dns(10, 0, 0, 1),
     gateway(10, 0, 0, 1),
     subnet(255, 255, 255, 0);
-unsigned int outPort;
+unsigned int outPort, outPort_from_config;
 unsigned int inPort;
 EthernetUDP Udp;
 boolean

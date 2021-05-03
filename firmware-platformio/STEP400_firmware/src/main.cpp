@@ -28,7 +28,7 @@ const char *firmwareName = "STEP400_PROTO_R4";
 #else
 const char *firmwareName = "STEP400";
 #endif
-const uint8_t firmwareVersion[3] = {1,0,1};
+const uint8_t firmwareVersion[3] = {1,0,2};
 const uint8_t applicableConfigVersion[2] = {1,0};
 
 // PowerSTEP01 SPI
@@ -133,9 +133,9 @@ void resetEthernet() {
     digitalWrite(W5500_RESET_PIN, HIGH);
     digitalWrite(ledPin, LOW);
     delay(1);
-    if ( isMyIpAddId ) myIp[3] += myId;
-    if ( isMacAddId ) mac[5] += myId;
-    if ( isOutPortAddId ) outPort += myId;
+    if ( isMyIpAddId ) myIp[3] = myIp_from_config[3] + myId;
+    if ( isMacAddId ) mac[5] = mac_from_config[5] + myId;
+    if ( isOutPortAddId ) outPort = outPort_from_config + myId;
     Ethernet.begin(mac, myIp, dns, gateway, subnet);
     Udp.begin(inPort);
 }

@@ -175,6 +175,8 @@ void setVoltageMode(uint8_t motorId);
 void setVoltageMode(OSCMessage& msg, int addrOffset);
 void setCurrentMode(uint8_t motorId);
 void setCurrentMode(OSCMessage& msg, int addrOffset);
+void setElPos(OSCMessage& msg, int addrOffset);
+void getElPos(OSCMessage& msg, int addrOffset);
 
 #endif
 
