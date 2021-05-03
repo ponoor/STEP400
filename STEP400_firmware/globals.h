@@ -12,7 +12,7 @@
 #include <Ponoor_PowerSTEP01Library.h>
 #include <Ethernet.h>
 
-//#define PROTOTYPE_R4 // Uncomment this line for the prototype r4 pcb.
+// #define PROTOTYPE_R4 // Uncomment this line for the prototype r4 pcb.
 
 // =============================================================================
 // Pin definitions
@@ -74,15 +74,16 @@ extern powerSTEP stepper[];
 #define MOTOR_ID_LAST   4
 
 // Network
-extern uint8_t mac[6], myId;
+extern uint8_t mac[6], mac_from_config[6], myId;
 extern IPAddress
     myIp,
+    myIp_from_config,
     destIp,
     dns,
     gateway,
     subnet;
 const IPAddress broadcastIp(255, 255, 255, 255);
-extern unsigned int inPort, outPort;
+extern unsigned int inPort, outPort, outPort_from_config;
 extern EthernetUDP Udp;
 extern bool
     isDestIpSet,

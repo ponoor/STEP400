@@ -147,6 +147,8 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getProhibitMotionOnHomeSw", getProhibitMotionOnHomeSw);
             bMsgRouted |= msgIN.route("/setProhibitMotionOnLimitSw", setProhibitMotionOnLimitSw);
             bMsgRouted |= msgIN.route("/getProhibitMotionOnLimitSw", getProhibitMotionOnLimitSw);
+            bMsgRouted |= msgIN.route("/getElPos", getElPos);
+            bMsgRouted |= msgIN.route("/setElPos", setElPos);
 
             turnOnRXL();
             if ((!bMsgRouted) && reportErrors) {
@@ -2224,6 +2226,30 @@ void setCurrentMode(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             setCurrentMode(i);
+        }
+    }
+}
+
+void setElPos(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    uint16_t newElPos = getInt(msg, 1);
+    if(isCorrectMotorId(motorID)) {
+        stepper[motorID - MOTOR_ID_FIRST].setElPos(newElPos);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            stepper[i].setElPos(newElPos);
+        }
+    }
+}
+void getElPos(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    if(isCorrectMotorId(motorID)) {
+        sendTwoData("/elPos", motorID, stepper[motorID - MOTOR_ID_FIRST].getElPos());
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            sendTwoData("/elPos", i + MOTOR_ID_FIRST, stepper[i].getElPos());
         }
     }
 }
