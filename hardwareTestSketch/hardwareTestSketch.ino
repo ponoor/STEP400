@@ -278,7 +278,7 @@ bool powerSTEP01Test() {
     for ( i = 0; i < NUM_OF_MOTOR; i++)
     {
       temp = 0;
-      p("PowerSTEO01 ID#%d\n STATUS: 0x%02X ",i+1, status[i]);
+      p("PowerSTEP01 ID#%d\n STATUS: 0x%02X ",i+1, status[i]);
       // OCD, active low, latched
       if ((status[i] & STATUS_OCD) == 0) {
         temp = 0x01;
@@ -323,7 +323,7 @@ bool powerSTEP01Test() {
       temp = stepper[i].getParam(ADC_OUT);
       p(" ADC_OUT: %d ", temp);
       if (temp < 25) {
-        p("Unexpected value. Chech ADC_OUT pin connection.\n");
+        p("Unexpected value. Check ADC_OUT pin connection.\n");
         result = false;
       }
       else {
