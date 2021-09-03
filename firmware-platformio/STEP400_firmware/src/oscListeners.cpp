@@ -2244,12 +2244,20 @@ void setElPos(OSCMessage& msg, int addrOffset) {
 }
 void getElPos(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
+    uint16_t elPos;
+    uint8_t microStepPos, step;
     if(isCorrectMotorId(motorID)) {
-        sendTwoData("/elPos", motorID, stepper[motorID - MOTOR_ID_FIRST].getElPos());
+        elPos = stepper[motorID - MOTOR_ID_FIRST].getElPos();
+        microStepPos = elPos&0x7F;
+        step = elPos>>7;
+        sendThreeInt("/elPos", motorID, step, microStepPos);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            sendTwoData("/elPos", i + MOTOR_ID_FIRST, stepper[i].getElPos());
+            elPos = stepper[i].getElPos();
+            microStepPos = elPos&0x7F;
+            step = elPos>>7;
+            sendThreeInt("/elPos", i + MOTOR_ID_FIRST, step, microStepPos);
         }
     }
 }

@@ -118,7 +118,7 @@ void printCurrentState() {
 	showBoolResult(F("SD config file open succeeded"), configFileOpenSucceeded);
 	showBoolResult(F("SD config JSON parse succeeded"), configFileParseSucceeded);
 
-	printHeader("PowerSTEP01");
+	printHeader("Motor Driver");
 	uint16_t status[NUM_OF_MOTOR];
 	uint32_t temp = 0;
 	for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -130,7 +130,7 @@ void printCurrentState() {
 		for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
 		{
 			temp = 0;
-			p("PowerSTEO01 ID#%d\n\tSTATUS: 0x%02X\n", i + 1, status[i]);
+			p("PowerSTEP01 ID#%d\n\tSTATUS: 0x%02X\n", i + 1, status[i]);
 			bt = (status[i] & STATUS_HIZ) > 0; // HiZ, high for HiZ
 			showBoolResult(F("\tHigh impedance state"), bt);
 			showBoolResult(F("\tBUSY"), !(status[i] & STATUS_BUSY));
@@ -212,15 +212,15 @@ void printCurrentState() {
 	}
 	
 	printHeader("Modes");
-	show4Bool(F("Servo Mode"),isServoMode);
-	show4Bool(F("Current Mode"), isCurrentMode);
-	show4Bool(F("Electromagnetic Brake Enable"),electromagnetBrakeEnable);
+	showAllBools(F("Servo Mode"),isServoMode);
+	showAllBools(F("Current Mode"), isCurrentMode);
+	showAllBools(F("Electromagnetic Brake Enable"),electromagnetBrakeEnable);
 	p("Brake status :\n");
 	String bsText[4] = {"BRAKE_ENGAGED","BRAKE_DISENGAGE_WAITING","BRAKE_DISENGAGED","BRAKE_MOTORHIZ_WAITING"};
 	for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
 		p("#%d : %s\n",i+1,bsText[brakeStatus[i]].c_str());
 	}
-	print4data(F("Homing status"), homingStatus);
+	printAllData(F("Homing status"), homingStatus);
 }
 
 
@@ -258,69 +258,69 @@ void printConfigurations() {
 	showBoolResult(F("reportErrors"), reportErrors);
 
 	printHeader("Report & Alarm");
-	show4Bool("reportBUSY", reportBUSY); 
-	show4Bool(F("reportBUSY"), reportBUSY);
-	show4Bool(F("reportHiZ"), reportHiZ);
-	show4Bool(F("reportHomeSwStatus"), reportHomeSwStatus);
-	show4Bool(F("reportLimitSwStatus"), reportLimitSwStatus);
-	show4Bool(F("reportDir"), reportDir);
-	show4Bool(F("reportMotorStatus"), reportMotorStatus);
-	show4Bool(F("reportSwEvn"), reportSwEvn);
-	show4Bool(F("reportUVLO"), reportUVLO);
-	show4Bool(F("reportThermalStatus"), reportThermalStatus);
-	show4Bool(F("reportOCD"), reportOCD);
-	show4Bool(F("reportStall"), reportStall);
-	show4Bool(F("reportOCD"), reportOCD);
-	print4data("OCThreshold", overCurrentThreshold);
+	showAllBools("reportBUSY", reportBUSY); 
+	showAllBools(F("reportBUSY"), reportBUSY);
+	showAllBools(F("reportHiZ"), reportHiZ);
+	showAllBools(F("reportHomeSwStatus"), reportHomeSwStatus);
+	showAllBools(F("reportLimitSwStatus"), reportLimitSwStatus);
+	showAllBools(F("reportDir"), reportDir);
+	showAllBools(F("reportMotorStatus"), reportMotorStatus);
+	showAllBools(F("reportSwEvn"), reportSwEvn);
+	showAllBools(F("reportUVLO"), reportUVLO);
+	showAllBools(F("reportThermalStatus"), reportThermalStatus);
+	showAllBools(F("reportOCD"), reportOCD);
+	showAllBools(F("reportStall"), reportStall);
+	showAllBools(F("reportOCD"), reportOCD);
+	printAllData("OCThreshold", overCurrentThreshold);
 
 	printHeader("driverSettings");
-	show4Bool(F("homingAtStartup"), bHomingAtStartup);
-	// show4Bool(F("homingDirection(1:FWD,0:REV)"),homingDirection);
+	showAllBools(F("homingAtStartup"), bHomingAtStartup);
+	// showAllBools(F("homingDirection(1:FWD,0:REV)"),homingDirection);
 	p("homingDirection(1:FWD,0:REV) : %d, %d, %d, %d\n", homingDirection[0], homingDirection[1], homingDirection[2], homingDirection[3]);
-	print4data(F("homingSpeed"), homingSpeed);
-	print4data(F("homeSwMode"), homeSwMode);
-	show4Bool(F("prohibitMotionOnHomeSw"),bProhibitMotionOnHomeSw);
-	print4data(F("limitSwMode"), limitSwMode);
-	show4Bool(F("prohibitMotionOnLimitSw"),bProhibitMotionOnLimitSw);
-	print4data(F("goUntilTimeout"), goUntilTimeout);
-	print4data(F("releaseSwTimeout"), releaseSwTimeout);
-	print4data("microStepMode", microStepMode);
-	show4Bool(F("isCurrentMode"), isCurrentMode);
-	print4data("slewRate", slewRateNum);
-	show4Bool(F("electromagnetBrakeEnable"), electromagnetBrakeEnable);
-	print4data(F("brakeTransitionDuration"), brakeTransitionDuration);
+	printAllData(F("homingSpeed"), homingSpeed);
+	printAllData(F("homeSwMode"), homeSwMode);
+	showAllBools(F("prohibitMotionOnHomeSw"),bProhibitMotionOnHomeSw);
+	printAllData(F("limitSwMode"), limitSwMode);
+	showAllBools(F("prohibitMotionOnLimitSw"),bProhibitMotionOnLimitSw);
+	printAllData(F("goUntilTimeout"), goUntilTimeout);
+	printAllData(F("releaseSwTimeout"), releaseSwTimeout);
+	printAllData("microStepMode", microStepMode);
+	showAllBools(F("isCurrentMode"), isCurrentMode);
+	printAllData("slewRate", slewRateNum);
+	showAllBools(F("electromagnetBrakeEnable"), electromagnetBrakeEnable);
+	printAllData(F("brakeTransitionDuration"), brakeTransitionDuration);
 
 	printHeader("speedProfile");
-	print4data("acc", acc);
-	print4data("dec", dec);
-	print4data("maxSpeed", maxSpeed);
-	print4data("fullStepSpeed", fullStepSpeed);
+	printAllData("acc", acc);
+	printAllData("dec", dec);
+	printAllData("maxSpeed", maxSpeed);
+	printAllData("fullStepSpeed", fullStepSpeed);
 
 	printHeader("Voltage mode");
-	print4data("kvalHold", kvalHold);
-	print4data("kvalRun", kvalRun);
-	print4data("kvalAcc", kvalAcc);
-	print4data("kvalDec", kvalDec);
-	print4data("intersectSpeed", intersectSpeed);
-	print4data("startSlope", startSlope);
-	print4data("accFinalSlope", accFinalSlope);
-	print4data("decFinalSlope", decFinalSlope);
-	print4data("stallThreshold", stallThreshold);
-	print4data("lowSpeedOptimize", lowSpeedOptimize);
+	printAllData("kvalHold", kvalHold);
+	printAllData("kvalRun", kvalRun);
+	printAllData("kvalAcc", kvalAcc);
+	printAllData("kvalDec", kvalDec);
+	printAllData("intersectSpeed", intersectSpeed);
+	printAllData("startSlope", startSlope);
+	printAllData("accFinalSlope", accFinalSlope);
+	printAllData("decFinalSlope", decFinalSlope);
+	printAllData("stallThreshold", stallThreshold);
+	printAllData("lowSpeedOptimize", lowSpeedOptimize);
 
 	printHeader("Current mode");
-	print4data("tvalHold", tvalHold);
-	print4data("tvalRun", tvalRun);
-	print4data("tvalAcc", tvalAcc);
-	print4data("tvalDec", tvalDec);
-	print4data("fastDecaySetting", fastDecaySetting);
-	print4data("minOnTime", minOnTime);
-	print4data("minOffTime", minOffTime);
+	printAllData("tvalHold", tvalHold);
+	printAllData("tvalRun", tvalRun);
+	printAllData("tvalAcc", tvalAcc);
+	printAllData("tvalDec", tvalDec);
+	printAllData("fastDecaySetting", fastDecaySetting);
+	printAllData("minOnTime", minOnTime);
+	printAllData("minOffTime", minOffTime);
 
 	printHeader("Servo mode");
-	print4data("kP", kP);
-	print4data("kI", kI);
-	print4data("kD", kD);
+	printAllData("kP", kP);
+	printAllData("kI", kI);
+	printAllData("kD", kD);
 }
 
 void printTitle(String title) {
@@ -333,27 +333,27 @@ void showBoolResult(String title, bool val) {
 }
 
 template <class T>
-T print4data(String title, T* val) {
+T printAllData(String title, T* val) {
+	String out;
 	printTitle(title);
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
 	{
-		SerialUSB.print(val[i]);
-		if (i < 3) SerialUSB.print(", ");
+		out += val[i];
+		if (i < (NUM_OF_MOTOR-1)) out +=", ";
 	}
-	SerialUSB.println();
+	SerialUSB.println(out);
 }
 
-
-void show4Bool(String title, bool* val) {
+void showAllBools(String title, bool* val) {
+	String out;
 	printTitle(title);
 	SerialUSB.print(" ");
-	for (uint8_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
 	{
-		String res = (val[i]) ? "Yes" : "No";
-		SerialUSB.print(res);
-		if (i < 3) SerialUSB.print(", ");
+		out += (val[i]) ? "Yes" : "No";
+		if (i<(NUM_OF_MOTOR-1)) out +=", ";
 	}
-	SerialUSB.println();
+	SerialUSB.println(out);
 }
 
 void showIpAddress(String title, IPAddress ip) {
