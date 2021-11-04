@@ -64,3 +64,8 @@ Contribution of [@loveandsheep](https://github.com/loveandsheep) and [@yuskegoto
 https://github.com/yuskegoto/STEP400_Node-RED
 
 Contribution of [@yuskegoto](https://github.com/yuskegoto)
+
+### Python library
+https://github.com/ponoor/python-step-series
+
+Contribution of [@JulianOrteil](https://github.com/JulianOrteil)
