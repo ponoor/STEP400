@@ -295,6 +295,7 @@ void printConfigurations() {
 	printAllData("dec", dec);
 	printAllData("maxSpeed", maxSpeed);
 	printAllData("fullStepSpeed", fullStepSpeed);
+	printAllData("minSpeed", minSpeed);
 
 	printHeader("Voltage mode");
 	printAllData("kvalHold", kvalHold);
@@ -306,7 +307,8 @@ void printConfigurations() {
 	printAllData("accFinalSlope", accFinalSlope);
 	printAllData("decFinalSlope", decFinalSlope);
 	printAllData("stallThreshold", stallThreshold);
-	printAllData("lowSpeedOptimize", lowSpeedOptimize);
+	showAllBools("lowSpeedOptimizeEnable", lowSpeedOptimizeEnable);
+	printAllData("lowSpeedOptimizeThreshold", lowSpeedOptimizeThreshold);
 
 	printHeader("Current mode");
 	printAllData("tvalHold", tvalHold);
