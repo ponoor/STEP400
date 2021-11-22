@@ -116,8 +116,10 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getStallThreshold", getStallThreshold);
             bMsgRouted |= msgIN.route("/setOverCurrentThreshold", setOverCurrentThreshold);
             bMsgRouted |= msgIN.route("/getOverCurrentThreshold", getOverCurrentThreshold);
+            bMsgRouted |= msgIN.route("/enableLowSpeedOptimize", enableLowSpeedOptimize);
             bMsgRouted |= msgIN.route("/setLowSpeedOptimizeThreshold", setLowSpeedOptimizeThreshold);
             bMsgRouted |= msgIN.route("/getLowSpeedOptimizeThreshold", getLowSpeedOptimizeThreshold);
+            bMsgRouted |= msgIN.route("/setMinSpeed", setMinSpeed);
 
             bMsgRouted |= msgIN.route("/setSpeedProfileRaw", setSpeedProfileRaw);
             bMsgRouted |= msgIN.route("/setMaxSpeedRaw", setMaxSpeedRaw);
@@ -1431,7 +1433,7 @@ void setMaxSpeed(OSCMessage& msg, int addrOffset) {
     }
 }
 
-void setMinpeed(OSCMessage& msg, int addrOffset) {
+void setMinSpeed(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     float _minSpeed = getFloat(msg, 1);
     if(isCorrectMotorId(motorID)) {
