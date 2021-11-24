@@ -120,6 +120,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/setLowSpeedOptimizeThreshold", setLowSpeedOptimizeThreshold);
             bMsgRouted |= msgIN.route("/getLowSpeedOptimizeThreshold", getLowSpeedOptimizeThreshold);
             bMsgRouted |= msgIN.route("/setMinSpeed", setMinSpeed);
+            bMsgRouted |= msgIN.route("/getMinSpeed", getMinSpeed);
 
             bMsgRouted |= msgIN.route("/setSpeedProfileRaw", setSpeedProfileRaw);
             bMsgRouted |= msgIN.route("/setMaxSpeedRaw", setMaxSpeedRaw);
@@ -1453,6 +1454,20 @@ void setMinSpeed(OSCMessage& msg, int addrOffset) {
     }  
 }
 
+void getMinSpeed(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    float _minSpeed;
+    if(isCorrectMotorId(motorID)) {
+        _minSpeed = stepper[motorID - MOTOR_ID_FIRST].getMinSpeed();
+        sendTwoData("/minSpeed", motorID, _minSpeed);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            _minSpeed = stepper[i].getMinSpeed();
+            sendTwoData("/minSpeed", i + 1, _minSpeed);
+        }
+    }
+}
 
 void setFullstepSpeed(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);

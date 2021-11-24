@@ -121,6 +121,7 @@ void getTval_mA(OSCMessage& msg, int addrOffset);
 void setSpeedProfile(OSCMessage& msg, int addrOffset);
 void setMaxSpeed(OSCMessage& msg, int addrOffset);
 void setMinSpeed(OSCMessage& msg, int addrOffset);
+void getMinSpeed(OSCMessage& msg, int addrOffset);
 void setFullstepSpeed(OSCMessage& msg, int addrOffset);
 void getFullstepSpeed(OSCMessage& msg, int addrOffset);
 void setAcc(OSCMessage& msg, int addrOffset);
