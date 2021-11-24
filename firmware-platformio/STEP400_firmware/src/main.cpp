@@ -336,20 +336,20 @@ void updateServo(uint32_t currentTimeMicros) {
             if (isServoMode[i]) {
                 int32_t error = targetPosition[i] - stepper[i].getPos();
                 integral[i] += ((error + eZ1[i]) / 2.0f);
-                if (integral[i] > 1500.0) integral[i] = 1500.0;
-                else if (integral[i] < -1500.0) integral[i] = -1500.0;
-                if (abs(error) > position_tolerance) {
+                if (integral[i] > 1500.0f) integral[i] = 1500.0f;
+                else if (integral[i] < -1500.0f) integral[i] = -1500.0f;
+                if (fabsf(error) > position_tolerance) {
                     double diff = error - eZ1[i];
 
                     spd = error * kP[i] + integral[i] * kI[i] + diff * kD[i];
                 }
                 eZ2[i] = eZ1[i];
                 eZ1[i] = error;
-                float absSpd = abs(spd);
-                //if (absSpd < 1.) {
+                float absSpd = fabsf(spd);
+                //if (absSpd < 1.0f) {
                 //    spd = 0.0;
                 //}
-                stepper[i].run((spd > 0), absSpd);
+                stepper[i].run((spd > 0.0f), absSpd);
             }
         }
         lastServoUpdateTime = currentTimeMicros;
