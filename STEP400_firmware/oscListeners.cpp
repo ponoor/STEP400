@@ -116,8 +116,11 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/getStallThreshold", getStallThreshold);
             bMsgRouted |= msgIN.route("/setOverCurrentThreshold", setOverCurrentThreshold);
             bMsgRouted |= msgIN.route("/getOverCurrentThreshold", getOverCurrentThreshold);
+            bMsgRouted |= msgIN.route("/enableLowSpeedOptimize", enableLowSpeedOptimize);
             bMsgRouted |= msgIN.route("/setLowSpeedOptimizeThreshold", setLowSpeedOptimizeThreshold);
             bMsgRouted |= msgIN.route("/getLowSpeedOptimizeThreshold", getLowSpeedOptimizeThreshold);
+            bMsgRouted |= msgIN.route("/setMinSpeed", setMinSpeed);
+            bMsgRouted |= msgIN.route("/getMinSpeed", getMinSpeed);
 
             bMsgRouted |= msgIN.route("/setSpeedProfileRaw", setSpeedProfileRaw);
             bMsgRouted |= msgIN.route("/setMaxSpeedRaw", setMaxSpeedRaw);
@@ -715,16 +718,18 @@ void getOverCurrentThreshold(OSCMessage& msg, int addrOffset) {
 
 void setLowSpeedOptimizeThreshold(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
-    float _minSpeed = getFloat(msg,1);
+    float _lowSpdOptThreshold = getFloat(msg,1);
     if(isCorrectMotorId(motorID)) {
         motorID -= MOTOR_ID_FIRST;
-        stepper[motorID].setMinSpeed(_minSpeed);
-        lowSpeedOptimize[motorID] = _minSpeed;
+        lowSpeedOptimizeThreshold[motorID] = _lowSpdOptThreshold;
+        if (lowSpeedOptimizeEnable[motorID])
+            stepper[motorID].setMinSpeed(_lowSpdOptThreshold);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            stepper[i].setMinSpeed(_minSpeed);
-            lowSpeedOptimize[i] = _minSpeed;
+            lowSpeedOptimizeThreshold[i] = _lowSpdOptThreshold;
+            if (lowSpeedOptimizeEnable[i])
+                stepper[i].setMinSpeed(_lowSpdOptThreshold);
         }
     }
 }
@@ -752,6 +757,32 @@ void getLowSpeedOptimizeThreshold(uint8_t motorId) {
     Udp.endPacket();
     newMes.empty();
     turnOnTXL();
+}
+
+void enableLowSpeedOptimize(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    bool state = getBool(msg, 1);
+    if(isCorrectMotorId(motorID)) {
+        motorID -= MOTOR_ID_FIRST;
+        stepper[motorID].setLoSpdOpt(state);
+        lowSpeedOptimizeEnable[motorID] = state;
+        if (state) {
+            stepper[motorID].setMinSpeed(lowSpeedOptimizeThreshold[motorID]);
+        } else {
+            stepper[motorID].setMinSpeed(minSpeed[motorID]);
+        }
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            stepper[i].setLoSpdOpt(state);
+            lowSpeedOptimizeEnable[i] = state;
+            if (state) {
+                stepper[i].setMinSpeed(lowSpeedOptimizeThreshold[i]);
+            } else {
+                stepper[i].setMinSpeed(minSpeed[i]);
+            }
+        }
+    }
 }
 
 void setBemfParam(OSCMessage& msg, int addrOffset) {
@@ -1402,7 +1433,41 @@ void setMaxSpeed(OSCMessage& msg, int addrOffset) {
         }
     }
 }
-// MIN_SPEED register is set by setLowSpeedOptimizeThreshold function.
+
+void setMinSpeed(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    float _minSpeed = getFloat(msg, 1);
+    if(isCorrectMotorId(motorID)) {
+        motorID -= MOTOR_ID_FIRST;
+        minSpeed[motorID] = _minSpeed;
+        if (!lowSpeedOptimizeEnable[motorID]) {
+            stepper[motorID].setMinSpeed(_minSpeed);
+        }
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            minSpeed[i] = _minSpeed;
+            if (!lowSpeedOptimizeEnable[motorID]) {
+                stepper[i].setMinSpeed(_minSpeed);
+            }
+        }
+    }  
+}
+
+void getMinSpeed(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    float _minSpeed;
+    if(isCorrectMotorId(motorID)) {
+        _minSpeed = stepper[motorID - MOTOR_ID_FIRST].getMinSpeed();
+        sendTwoData("/minSpeed", motorID, _minSpeed);
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            _minSpeed = stepper[i].getMinSpeed();
+            sendTwoData("/minSpeed", i + 1, _minSpeed);
+        }
+    }
+}
 
 void setFullstepSpeed(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
@@ -2244,12 +2309,20 @@ void setElPos(OSCMessage& msg, int addrOffset) {
 }
 void getElPos(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
+    uint16_t elPos;
+    uint8_t microStepPos, step;
     if(isCorrectMotorId(motorID)) {
-        sendTwoData("/elPos", motorID, stepper[motorID - MOTOR_ID_FIRST].getElPos());
+        elPos = stepper[motorID - MOTOR_ID_FIRST].getElPos();
+        microStepPos = elPos&0x7F;
+        step = elPos>>7;
+        sendThreeInt("/elPos", motorID, step, microStepPos);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            sendTwoData("/elPos", i + MOTOR_ID_FIRST, stepper[i].getElPos());
+            elPos = stepper[i].getElPos();
+            microStepPos = elPos&0x7F;
+            step = elPos>>7;
+            sendThreeInt("/elPos", i + MOTOR_ID_FIRST, step, microStepPos);
         }
     }
 }

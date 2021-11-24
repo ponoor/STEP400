@@ -11,7 +11,7 @@
 <div class="container">
 
 
-<h1>STEP400 configuration tool <span>rev 1.1</span></h1>
+<h1>STEP400 configuration tool <span>rev 1.0</span></h1>
 
 <div class="file-input">
     <input type='file' name="load" class="file" id="test">
@@ -40,7 +40,7 @@
     </div>
     <div class="input-items -sm">
         <input type="number" name="configVersion" size="10" min="0" max="255" value="1" readonly="readonly">
-        <input type="number" name="configVersion" size="10" min="0" max="255" value="1" readonly="readonly">
+        <input type="number" name="configVersion" size="10" min="0" max="255" value="0" readonly="readonly">
     </div>
 </li>
 <li>
@@ -811,7 +811,7 @@
 </li>
 <li>
     <div class="input-label">
-        <label class="hint">Deceleration</label>
+        <label class="hint">Decceleration</label>
         <p class="tooltip">Deceleration of the motor</p>
     </div>
     <div class="input-items">
@@ -848,20 +848,6 @@
         <input type="number" name="fullStepSpeed" min="7.63" max="15625" value="15625" step="0.01">
         <input type="number" name="fullStepSpeed" min="7.63" max="15625" value="15625" step="0.01">
         <input type="number" name="fullStepSpeed" min="7.63" max="15625" value="15625" step="0.01">
-        <span class="unit">step/s</span>
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Min speed</label>
-        <p class="tooltip">This value defines a minimum speed of the motor, and also releaseSw speed which is a part of the homing procedure.</p>
-    </div>
-    <div class="input-items">
-        <input type="number" name="minSpeed" min="0.0" max="976.3" value="0" step="0.01">
-        <input type="number" name="minSpeed" min="0.0" max="976.3" value="0" step="0.01">
-        <input type="number" name="minSpeed" min="0.0" max="976.3" value="0" step="0.01">
-        <input type="number" name="minSpeed" min="0.0" max="976.3" value="0" step="0.01">
-        <input type="number" name="minSpeed" min="0.0" max="976.3" value="0" step="0.01">
         <span class="unit">step/s</span>
     </div>
 </li>
@@ -1178,21 +1164,7 @@
 </li>
 <li>
     <div class="input-label">
-        <label class="hint">Low speed optimization enable</label>
-        <p class="tooltip">Reduce the phase current distortion at a very low speed using a small driving voltage. When this optimization is enabled, speed profile minimum speed is forced to zero.</p>
-    </div>
-    <div class="input-items">
-        <input type="checkbox" name="lowSpeedOptimizeEnable">
-        <input type="checkbox" name="lowSpeedOptimizeEnable">
-        <input type="checkbox" name="lowSpeedOptimizeEnable">
-        <input type="checkbox" name="lowSpeedOptimizeEnable">
-        <input type="checkbox" name="lowSpeedOptimizeEnable">
-        <span class="unit"></span>
-    </div>
-</li>
-<li>
-    <div class="input-label">
-        <label class="hint">Low speed optimization threshold</label>
+        <label class="hint">lowSpeedOptimize</label>
         <p class="tooltip">The speed threshold below which the low speed compensation works.</p>
     </div>
     <div class="input-items">

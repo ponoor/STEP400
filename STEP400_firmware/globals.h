@@ -195,7 +195,9 @@ extern uint8_t
     microStepMode[NUM_OF_MOTOR]; // STEP_MODE
 extern uint16_t slewRate[NUM_OF_MOTOR]; // GATECFG1
 extern uint8_t slewRateNum[NUM_OF_MOTOR]; // [0]114, [1]220, [2]400, [3]520, [4]790, [5]980.
-extern float lowSpeedOptimize[NUM_OF_MOTOR];
+extern float lowSpeedOptimizeThreshold[NUM_OF_MOTOR];
+extern float minSpeed[NUM_OF_MOTOR];
+extern bool lowSpeedOptimizeEnable[NUM_OF_MOTOR];
 extern bool electromagnetBrakeEnable[NUM_OF_MOTOR];
 extern uint16_t brakeTransitionDuration[NUM_OF_MOTOR];
 extern float

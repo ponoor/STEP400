@@ -20,9 +20,9 @@ void printConfigurations();
 void printTitle(String title);
 void showBoolResult(String title, bool val);
 template <class T>
-T print4data(String title, T* val);
+T printAllData(String title, T* val);
 
-void show4Bool(String title, bool* val);
+void showAllBools(String title, bool* val);
 void showIpAddress(String title, IPAddress ip);
 void boldHeader(String header);
 void printHeader(String header);
