@@ -750,7 +750,7 @@ void getLowSpeedOptimizeThreshold(uint8_t motorId) {
     bool optimizationEnabled = (stepper[motorId].getParam(MIN_SPEED) & (1 << 12)) > 0;
     OSCMessage newMes("/lowSpeedOptimizeThreshold");
     newMes.add((int32_t)motorId + MOTOR_ID_FIRST);
-    newMes.add(stepper[motorId].getMinSpeed());
+    newMes.add(lowSpeedOptimizeThreshold[motorId]);
     newMes.add(optimizationEnabled);
     Udp.beginPacket(destIp, outPort);
     newMes.send(Udp);
