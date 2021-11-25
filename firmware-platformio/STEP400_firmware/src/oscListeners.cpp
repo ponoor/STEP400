@@ -1456,15 +1456,12 @@ void setMinSpeed(OSCMessage& msg, int addrOffset) {
 
 void getMinSpeed(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
-    float _minSpeed;
     if(isCorrectMotorId(motorID)) {
-        _minSpeed = stepper[motorID - MOTOR_ID_FIRST].getMinSpeed();
-        sendTwoData("/minSpeed", motorID, _minSpeed);
+        sendTwoData("/minSpeed", motorID, minSpeed[motorID-MOTOR_ID_FIRST]);
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
-            _minSpeed = stepper[i].getMinSpeed();
-            sendTwoData("/minSpeed", i + 1, _minSpeed);
+            sendTwoData("/minSpeed", i + 1, minSpeed[i]);
         }
     }
 }
