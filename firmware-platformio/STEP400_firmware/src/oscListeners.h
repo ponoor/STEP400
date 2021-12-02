@@ -28,6 +28,7 @@ void getConfigName(OSCMessage& msg, int addrOffset);
 void getConfigRegister(uint8_t deviceId);
 void getConfigRegister(OSCMessage& msg, int addrOffset);
 void resetMotorDriver(OSCMessage& msg, int addrOffset);
+void resetDevice(OSCMessage& msg, int addrOffset);
 void reportError(OSCMessage& msg, int addrOffset);
 void getAdcVal(OSCMessage& msg, int addrOffset);
 void resetDev(OSCMessage& msg, int addrOffset);
