@@ -43,7 +43,7 @@ void enableThermalStatusReport(OSCMessage& msg, int addrOffset);
 void enableOverCurrentReport(OSCMessage& msg, int addrOffset);
 void enableStallReport(OSCMessage& msg, int addrOffset);
 void enablePositionReport(OSCMessage& msg, int addrOffset);
-void enablePositionReportList(OSCMessage& msg, int addrOffset);
+void enablePositionListReport(OSCMessage& msg, int addrOffset);
 void getHomeSw(OSCMessage& msg, int addrOffset);
 void getHomeSw(uint8_t motorId);
 void getLimitSw(OSCMessage& msg, int addrOffset);
@@ -142,6 +142,8 @@ void getSpeedProfileRaw(uint8_t motorId);
 
 // operational_commands_osc_listener
 void getPosition(OSCMessage& msg, int addrOffset);
+void getPositionList();
+void getPositionList(OSCMessage& msg, int addrOffset);
 void getMark(OSCMessage& msg, int addrOffset);
 void run(OSCMessage& msg, int addrOffset);
 void runRaw(OSCMessage& msg, int addrOffset);

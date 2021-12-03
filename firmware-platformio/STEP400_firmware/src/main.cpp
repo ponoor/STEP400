@@ -340,11 +340,7 @@ void updatePositionReport(uint32_t _currentTimeMillis) {
 void updatePositionReportList(uint32_t _currentTimeMillis) {
     static uint32_t lastPollTime = 0;
     if ((uint32_t)(_currentTimeMillis - lastPollTime) >= reportPositionListInterval) {
-        int32_t pos[NUM_OF_MOTOR];
-        for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
-            pos[i] = stepper[i].getPos();
-        }
-        sendAllData("/positionList", pos);
+        getPositionList();
         lastPollTime = _currentTimeMillis;
     }
 }

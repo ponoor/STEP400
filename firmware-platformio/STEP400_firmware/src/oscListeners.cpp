@@ -19,6 +19,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/setTargetPosition", setTargetPosition);
             bMsgRouted |= msgIN.route("/setTargetPositionList", setTargetPositionList);
             bMsgRouted |= msgIN.route("/getPosition", getPosition);
+            bMsgRouted |= msgIN.route("/getPositionList", getPositionList);
             bMsgRouted |= msgIN.route("/getSpeed", getSpeed);
             bMsgRouted |= msgIN.route("/run", run);
             bMsgRouted |= msgIN.route("/runRaw", runRaw);
@@ -101,7 +102,7 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/enableOverCurrentReport", enableOverCurrentReport);
             bMsgRouted |= msgIN.route("/enableStallReport", enableStallReport);
             bMsgRouted |= msgIN.route("/enablePositionReport", enablePositionReport);
-            bMsgRouted |= msgIN.route("/enablePositionReportList", enablePositionReportList);
+            bMsgRouted |= msgIN.route("/enablePositionListReport", enablePositionListReport);
             bMsgRouted |= msgIN.route("/getLimitSw", getLimitSw);
             bMsgRouted |= msgIN.route("/getLimitSwMode", getLimitSwMode);
             bMsgRouted |= msgIN.route("/setLimitSwMode", setLimitSwMode);
@@ -446,7 +447,7 @@ void enablePositionReport(OSCMessage& msg, int addrOffset) {
         }
     }
 }
-void enablePositionReportList(OSCMessage& msg, int addrOffset) {
+void enablePositionListReport(OSCMessage& msg, int addrOffset) {
     int16_t interval = getInt(msg,0);
     if ( interval < 0) interval = 0;
     bool bEnable = interval>0;
@@ -1735,6 +1736,18 @@ void getPosition(OSCMessage& msg, int addrOffset) {
         }
     }
 }
+
+void getPositionList() {
+    int32_t pos[NUM_OF_MOTOR];
+    for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
+        pos[i] = stepper[i].getPos();
+    }
+    sendAllData("/positionList", pos);
+}
+void getPositionList(OSCMessage& msg, int addrOffset) {
+    getPositionList();
+}
+
 void getMark(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
