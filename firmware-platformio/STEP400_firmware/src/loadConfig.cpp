@@ -15,7 +15,7 @@ void loadConfig() {
     // Allocate a temporary JsonDocument
     // Don't forget to change the capacity to match your requirements.
     // Use arduinojson.org/v6/assistant to compute the capacity.
-    DynamicJsonDocument doc(7200); // 6144
+    DynamicJsonDocument doc(8192);
     DeserializationError error = deserializeJson(doc, file);
     if (error) {
         p("Failed to read file: %s\nUsing default configuration.\n", error.f_str());
@@ -79,6 +79,7 @@ void loadConfig() {
     JsonArray alarmAndReport_reportStall = alarmAndReport["reportStall"];
     JsonArray alarmAndReport_reportLimitSwStatus = alarmAndReport["reportLimitSwStatus"];
     JsonArray alarmAndReport_OCThreshold = alarmAndReport["OCThreshold"];
+    JsonArray alarmAndReport_reportPositionInterval = alarmAndReport["reportPositionInterval"];
     for (i = 0; i < NUM_OF_MOTOR; i++)
     {
         reportBUSY[i] = (int)alarmAndReport_reportBUSY[i] | false;
@@ -92,8 +93,10 @@ void loadConfig() {
         reportThermalStatus[i] = (int)alarmAndReport_reportThermalStatus[i] | true;
         reportOCD[i] = (int)alarmAndReport_reportOCD[i] | true;
         reportStall[i] = (int)alarmAndReport_reportStall[i] | false;
+        reportPositionInterval[i] = (int)alarmAndReport_reportPositionInterval[i] | 0;
         overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15; // 15=5A
     }
+    reportPositionListInterval = alarmAndReport["reportPositionListInterval"] | 0; // 0
 
     // Driver settings
     JsonObject driverSettings = doc["driverSettings"];

@@ -76,6 +76,8 @@ bool
     reportThermalStatus[NUM_OF_MOTOR],
     reportOCD[NUM_OF_MOTOR],
     reportStall[NUM_OF_MOTOR],
+    reportPosition[NUM_OF_MOTOR],
+    reportPositionList,
     limitSwState[NUM_OF_MOTOR],
     reportLimitSwStatus[NUM_OF_MOTOR],
     limitSwMode[NUM_OF_MOTOR],
@@ -86,7 +88,9 @@ bool
 float homingSpeed[NUM_OF_MOTOR] = {50.0, 50.0, 50.0, 50.0};
 uint16_t
     goUntilTimeout[NUM_OF_MOTOR] = {10000,10000,10000,10000},
-    releaseSwTimeout[NUM_OF_MOTOR] = {10000,10000,10000,10000};
+    releaseSwTimeout[NUM_OF_MOTOR] = {10000,10000,10000,10000},
+    reportPositionInterval[NUM_OF_MOTOR] = {0,0,0,0},
+    reportPositionListInterval;
 uint8_t kvalHold[NUM_OF_MOTOR], kvalRun[NUM_OF_MOTOR], kvalAcc[NUM_OF_MOTOR], kvalDec[NUM_OF_MOTOR];
 uint8_t tvalHold[NUM_OF_MOTOR], tvalRun[NUM_OF_MOTOR], tvalAcc[NUM_OF_MOTOR], tvalDec[NUM_OF_MOTOR];
 bool isCurrentMode[NUM_OF_MOTOR];

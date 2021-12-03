@@ -325,6 +325,30 @@ void checkHomingTimeout(uint32_t _currentTimeMillis) {
     }
 }
 
+void updatePositionReport(uint32_t _currentTimeMillis) {
+    static uint32_t lastPollTime[NUM_OF_MOTOR] = { 0,0,0,0 };
+    for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
+        if (reportPosition[i]) {
+            if ((uint32_t)(_currentTimeMillis - lastPollTime[i]) >= reportPositionInterval[i]) {
+                sendTwoData("/position", i + MOTOR_ID_FIRST, stepper[i].getPos());
+                lastPollTime[i] = _currentTimeMillis;
+            }
+        }
+    }
+}
+
+void updatePositionReportList(uint32_t _currentTimeMillis) {
+    static uint32_t lastPollTime = 0;
+    if ((uint32_t)(_currentTimeMillis - lastPollTime) >= reportPositionListInterval) {
+        int32_t pos[NUM_OF_MOTOR];
+        for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
+            pos[i] = stepper[i].getPos();
+        }
+        sendAllData("/positionList", pos);
+        lastPollTime = _currentTimeMillis;
+    }
+}
+
 void updateServo(uint32_t currentTimeMicros) {
     static uint32_t lastServoUpdateTime = 0;
     static float eZ1[NUM_OF_MOTOR] = { 0,0,0,0 },
@@ -367,6 +391,9 @@ void loop() {
         checkLimitSw();
         checkBrake(currentTimeMillis);
         checkHomingTimeout(currentTimeMillis);
+        updatePositionReport(currentTimeMillis);
+        if ( reportPositionList) 
+            updatePositionReportList(currentTimeMillis);
         checkStatus();
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();

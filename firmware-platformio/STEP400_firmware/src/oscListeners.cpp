@@ -100,6 +100,8 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/enableThermalStatusReport", enableThermalStatusReport);
             bMsgRouted |= msgIN.route("/enableOverCurrentReport", enableOverCurrentReport);
             bMsgRouted |= msgIN.route("/enableStallReport", enableStallReport);
+            bMsgRouted |= msgIN.route("/enablePositionReport", enablePositionReport);
+            bMsgRouted |= msgIN.route("/enablePositionReportList", enablePositionReportList);
             bMsgRouted |= msgIN.route("/getLimitSw", getLimitSw);
             bMsgRouted |= msgIN.route("/getLimitSwMode", getLimitSwMode);
             bMsgRouted |= msgIN.route("/setLimitSwMode", setLimitSwMode);
@@ -418,6 +420,42 @@ void enableStallReport(OSCMessage& msg, int addrOffset) {
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             reportStall[i] = bEnable;
+        }
+    }
+}
+
+void enablePositionReport(OSCMessage& msg, int addrOffset) {
+    uint8_t motorID = getInt(msg, 0);
+    int16_t interval = getInt(msg,1);
+    if ( interval < 0) interval = 0;
+    bool bEnable = interval>0;
+    if(isCorrectMotorId(motorID)) {
+        reportPosition[motorID - MOTOR_ID_FIRST] = bEnable;
+        reportPositionInterval[motorID - MOTOR_ID_FIRST] = interval;
+        if (bEnable)
+            reportPositionList = false;
+    }
+    else if (motorID == MOTOR_ID_ALL) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            reportPosition[i] = bEnable;
+            reportPositionInterval[i] = interval;
+        }
+        if (bEnable) {
+            reportPositionList = false;
+            reportPositionListInterval = 0;
+        }
+    }
+}
+void enablePositionReportList(OSCMessage& msg, int addrOffset) {
+    int16_t interval = getInt(msg,0);
+    if ( interval < 0) interval = 0;
+    bool bEnable = interval>0;
+    reportPositionList = bEnable;
+    reportPositionListInterval = interval;
+    if (bEnable) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            reportPosition[i] = false;
+            reportPositionInterval[i] = 0;
         }
     }
 }
