@@ -34,8 +34,6 @@ window.addEventListener('DOMContentLoaded', function() {
             reportThermalStatus: document.querySelectorAll("input[name='reportThermalStatus']"),
             reportOCD: document.querySelectorAll("input[name='reportOCD']"),
             reportStall: document.querySelectorAll("input[name='reportStall']"),
-            reportPositionInterval: document.querySelectorAll("input[name='reportPositionInterval']"),
-            reportPositionListInterval: document.querySelector("input[name='reportPositionListInterval']"),
             OCThreshold: document.querySelectorAll("select[name='OCThreshold']")
         }, 
         driverSettings: {
