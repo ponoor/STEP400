@@ -120,16 +120,22 @@ window.addEventListener('DOMContentLoaded', function() {
 
         for(paramName in catInputs) {
             var paramInputs = catInputs[paramName];
-            if(e.target.checked) {
-                paramInputs[0].removeAttribute('disabled');
-                for (var i = 0; i < NUM_MOTOR; i ++) {
-                    paramInputs[i + 1].setAttribute('disabled', 'disabled');
+            if (paramInputs.nodeType === undefined) {
+                // paramInputs is NodeList
+                if(e.target.checked) {
+                    paramInputs[0].removeAttribute('disabled');
+                    for (var i = 0; i < NUM_MOTOR; i ++) {
+                        paramInputs[i + 1].setAttribute('disabled', 'disabled');
+                    }
+                } else {
+                    paramInputs[0].setAttribute('disabled', 'disabled');
+                    for (var i = 0; i < NUM_MOTOR; i ++) {
+                        paramInputs[i + 1].removeAttribute('disabled');
+                    }
                 }
             } else {
-                paramInputs[0].setAttribute('disabled', 'disabled');
-                for (var i = 0; i < NUM_MOTOR; i ++) {
-                    paramInputs[i + 1].removeAttribute('disabled');
-                }
+                // paramInputs is Element
+                paramInputs.removeAttribute('disabled');
             }
         }
         if (e.target.checked) {
@@ -165,13 +171,17 @@ window.addEventListener('DOMContentLoaded', function() {
                 } else {
                     var isTargetAll = targetAllInputs[catName].checked;
                     for (paramName in inputElements[catName]) {
-                        configObject[catName][paramName] = [];
-                        for (var i = 0; i < NUM_MOTOR; i ++) {
-                            if (isTargetAll) {
-                                configObject[catName][paramName].push(getInputValue(inputElements[catName][paramName][0]));
-                            } else {
-                                configObject[catName][paramName].push(getInputValue(inputElements[catName][paramName][i+1]));
+                        if (inputElements[catName][paramName].nodeType === undefined) {
+                            configObject[catName][paramName] = [];
+                            for (var i = 0; i < NUM_MOTOR; i ++) {
+                                if (isTargetAll) {
+                                    configObject[catName][paramName].push(getInputValue(inputElements[catName][paramName][0]));
+                                } else {
+                                    configObject[catName][paramName].push(getInputValue(inputElements[catName][paramName][i+1]));
+                                }
                             }
+                        } else {
+                            configObject[catName][paramName] = getInputValue(inputElements[catName][paramName]);
                         }
                     }
                 }
@@ -230,8 +240,12 @@ window.addEventListener('DOMContentLoaded', function() {
                                 }
                             } else {
                                 for (paramName in inputElements[catName]) {
-                                    for (var i = 0; i < NUM_MOTOR; i ++) {
-                                        setInputValue(inputElements[catName][paramName][i+1], jsonObject[catName][paramName][i]);
+                                    if (inputElements[catName][paramName].nodeType === undefined) {
+                                        for (var i = 0; i < NUM_MOTOR; i ++) {
+                                            setInputValue(inputElements[catName][paramName][i+1], jsonObject[catName][paramName][i]);
+                                        }
+                                    } else {
+                                        setInputValue(inputElements[catName][paramName], jsonObject[catName][paramName]);
                                     }
                                 }
                             }
