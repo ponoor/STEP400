@@ -101,8 +101,8 @@ void OSCMsgReceive() {
             bMsgRouted |= msgIN.route("/enableThermalStatusReport", enableThermalStatusReport);
             bMsgRouted |= msgIN.route("/enableOverCurrentReport", enableOverCurrentReport);
             bMsgRouted |= msgIN.route("/enableStallReport", enableStallReport);
-            bMsgRouted |= msgIN.route("/enablePositionReport", enablePositionReport);
-            bMsgRouted |= msgIN.route("/enablePositionListReport", enablePositionListReport);
+            bMsgRouted |= msgIN.route("/setPositionReportInterval", setPositionReportInterval);
+            bMsgRouted |= msgIN.route("/setPositionListReportInterval", setPositionListReportInterval);
             bMsgRouted |= msgIN.route("/getLimitSw", getLimitSw);
             bMsgRouted |= msgIN.route("/getLimitSwMode", getLimitSwMode);
             bMsgRouted |= msgIN.route("/setLimitSwMode", setLimitSwMode);
@@ -425,7 +425,7 @@ void enableStallReport(OSCMessage& msg, int addrOffset) {
     }
 }
 
-void enablePositionReport(OSCMessage& msg, int addrOffset) {
+void setPositionReportInterval(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     int16_t interval = getInt(msg,1);
     if ( interval < 0) interval = 0;
@@ -447,7 +447,7 @@ void enablePositionReport(OSCMessage& msg, int addrOffset) {
         }
     }
 }
-void enablePositionListReport(OSCMessage& msg, int addrOffset) {
+void setPositionListReportInterval(OSCMessage& msg, int addrOffset) {
     int16_t interval = getInt(msg,0);
     if ( interval < 0) interval = 0;
     bool bEnable = interval>0;
