@@ -28,8 +28,8 @@ const char *firmwareName = "STEP400_PROTO_R4";
 #else
 const char *firmwareName = "STEP400";
 #endif
-const uint8_t firmwareVersion[3] = {1,0,3};
-const uint8_t applicableConfigVersion[2] = {1,1};
+const uint8_t firmwareVersion[3] = {1,0,4};
+const uint8_t applicableConfigVersion[2] = {1,2};
 
 // PowerSTEP01 SPI
 SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins
@@ -325,6 +325,26 @@ void checkHomingTimeout(uint32_t _currentTimeMillis) {
     }
 }
 
+void updatePositionReport(uint32_t _currentTimeMillis) {
+    static uint32_t lastPollTime[NUM_OF_MOTOR] = { 0,0,0,0 };
+    for (uint8_t i=0; i<NUM_OF_MOTOR; i++) {
+        if (reportPosition[i]) {
+            if ((uint32_t)(_currentTimeMillis - lastPollTime[i]) >= reportPositionInterval[i]) {
+                sendTwoData("/position", i + MOTOR_ID_FIRST, stepper[i].getPos());
+                lastPollTime[i] = _currentTimeMillis;
+            }
+        }
+    }
+}
+
+void updatePositionReportList(uint32_t _currentTimeMillis) {
+    static uint32_t lastPollTime = 0;
+    if ((uint32_t)(_currentTimeMillis - lastPollTime) >= reportPositionListInterval) {
+        getPositionList();
+        lastPollTime = _currentTimeMillis;
+    }
+}
+
 void updateServo(uint32_t currentTimeMicros) {
     static uint32_t lastServoUpdateTime = 0;
     static float eZ1[NUM_OF_MOTOR] = { 0,0,0,0 },
@@ -336,20 +356,20 @@ void updateServo(uint32_t currentTimeMicros) {
             if (isServoMode[i]) {
                 int32_t error = targetPosition[i] - stepper[i].getPos();
                 integral[i] += ((error + eZ1[i]) / 2.0f);
-                if (integral[i] > 1500.0) integral[i] = 1500.0;
-                else if (integral[i] < -1500.0) integral[i] = -1500.0;
-                if (abs(error) > position_tolerance) {
+                if (integral[i] > 1500.0f) integral[i] = 1500.0f;
+                else if (integral[i] < -1500.0f) integral[i] = -1500.0f;
+                if (fabsf(error) > position_tolerance) {
                     double diff = error - eZ1[i];
 
                     spd = error * kP[i] + integral[i] * kI[i] + diff * kD[i];
                 }
                 eZ2[i] = eZ1[i];
                 eZ1[i] = error;
-                float absSpd = abs(spd);
-                //if (absSpd < 1.) {
+                float absSpd = fabsf(spd);
+                //if (absSpd < 1.0f) {
                 //    spd = 0.0;
                 //}
-                stepper[i].run((spd > 0), absSpd);
+                stepper[i].run((spd > 0.0f), absSpd);
             }
         }
         lastServoUpdateTime = currentTimeMicros;
@@ -367,6 +387,9 @@ void loop() {
         checkLimitSw();
         checkBrake(currentTimeMillis);
         checkHomingTimeout(currentTimeMillis);
+        updatePositionReport(currentTimeMillis);
+        if ( reportPositionList) 
+            updatePositionReportList(currentTimeMillis);
         checkStatus();
         checkLED(currentTimeMillis);
         uint8_t t = getMyId();

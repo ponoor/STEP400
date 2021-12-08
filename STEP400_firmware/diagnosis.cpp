@@ -271,6 +271,8 @@ void printConfigurations() {
 	showAllBools(F("reportOCD"), reportOCD);
 	showAllBools(F("reportStall"), reportStall);
 	showAllBools(F("reportOCD"), reportOCD);
+	printAllData(F("reportPosition Interval"), reportPositionInterval);
+	p("reportPositionList Interval : %d\n", reportPositionListInterval);
 	printAllData("OCThreshold", overCurrentThreshold);
 
 	printHeader("driverSettings");
