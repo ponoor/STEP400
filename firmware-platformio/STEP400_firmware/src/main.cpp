@@ -29,7 +29,7 @@ const char *firmwareName = "STEP400_PROTO_R4";
 const char *firmwareName = "STEP400";
 #endif
 const uint8_t firmwareVersion[3] = {1,0,4};
-const uint8_t applicableConfigVersion[2] = {1,1};
+const uint8_t applicableConfigVersion[2] = {1,2};
 
 // PowerSTEP01 SPI
 SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins

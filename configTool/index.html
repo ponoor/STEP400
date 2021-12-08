@@ -371,12 +371,12 @@
         <p class="tooltip">Set the interval of motor position report message in millisecond. Set 0 to disable.</p>
     </div>
     <div class="input-items">
-        <input type="number" name="reportPositionInterval" min="0" max="65535" value="0" step="1">
-        <input type="number" name="reportPositionInterval" min="0" max="65535" value="0" step="1">
-        <input type="number" name="reportPositionInterval" min="0" max="65535" value="0" step="1">
-        <input type="number" name="reportPositionInterval" min="0" max="65535" value="0" step="1">
-        <input type="number" name="reportPositionInterval" min="0" max="65535" value="0" step="1">
-        <span class="unit">[ms]</span>
+        <input type="number" name="reportPositionInterval" min="0" value="0" step="1">
+        <input type="number" name="reportPositionInterval" min="0" value="0" step="1">
+        <input type="number" name="reportPositionInterval" min="0" value="0" step="1">
+        <input type="number" name="reportPositionInterval" min="0" value="0" step="1">
+        <input type="number" name="reportPositionInterval" min="0" value="0" step="1">
+        <span class="unit">ms</span>
     </div>
 </li>
 <li>
@@ -384,7 +384,10 @@
         <label class="hint">Motor position list report interval</label>
         <p class="tooltip">Set the interval of all motors position report message in millisecond. Set 0 to disable.</p>
     </div>
-    <div class="input-items"><input type="number" name="reportPositionListInterval" min="0" max="65535" value="0" step="1"></div>
+    <div class="input-items">
+        <input type="number" name="reportPositionListInterval" min="0" value="0" step="1">
+        <span class="unit">ms</span>
+    </div>
 </li>
 <li>
     <div class="input-label">

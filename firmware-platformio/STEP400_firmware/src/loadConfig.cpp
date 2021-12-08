@@ -94,10 +94,18 @@ void loadConfig() {
         reportOCD[i] = (int)alarmAndReport_reportOCD[i] | true;
         reportStall[i] = (int)alarmAndReport_reportStall[i] | false;
         reportPositionInterval[i] = (int)alarmAndReport_reportPositionInterval[i] | 0;
+        reportPosition[i] = reportPositionInterval[i] > 0;
         overCurrentThreshold[i] = alarmAndReport_OCThreshold[i] | 15; // 15=5A
     }
     reportPositionListInterval = alarmAndReport["reportPositionListInterval"] | 0; // 0
-
+    reportPositionList = reportPositionListInterval > 0;
+    if (reportPositionList) {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+            reportPosition[i] = false;
+            reportPositionInterval[i] = 0;
+        }
+    }
+    
     // Driver settings
     JsonObject driverSettings = doc["driverSettings"];
     JsonArray driverSettings_homingAtStartup = driverSettings["homingAtStartup"];

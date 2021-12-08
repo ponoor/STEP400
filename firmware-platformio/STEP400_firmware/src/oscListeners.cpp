@@ -2350,7 +2350,11 @@ void setCurrentMode(OSCMessage& msg, int addrOffset) {
 
 void setElPos(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
-    uint16_t newElPos = getInt(msg, 1);
+    uint8_t newFullStep = getInt(msg, 1);
+    uint8_t newMicroStep = getInt(msg, 2);
+    newFullStep = constrain(newFullStep,0,3);
+    newMicroStep = constrain(newMicroStep,0,127);
+    uint16_t newElPos = (newFullStep<<7) | newMicroStep;
     if(isCorrectMotorId(motorID)) {
         stepper[motorID - MOTOR_ID_FIRST].setElPos(newElPos);
     }
