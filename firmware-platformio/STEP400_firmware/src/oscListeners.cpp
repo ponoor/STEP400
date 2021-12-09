@@ -489,7 +489,7 @@ void getLimitSw(OSCMessage& msg, int addrOffset) {
     }
 }
 void getLimitSw(uint8_t motorId) {
-    sendThreeInt("limitSw", motorId + MOTOR_ID_FIRST, limitSwState[motorId], dir[motorId]);
+    sendThreeInt("/limitSw", motorId + MOTOR_ID_FIRST, limitSwState[motorId], dir[motorId]);
 }
 
 void getBusy(OSCMessage& msg, int addrOffset) {
