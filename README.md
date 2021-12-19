@@ -13,6 +13,10 @@ The current firmware is focused on working with [Open Sound Control](http://open
 Stepper driver chips are STMicroelectronics's [powerSTEP01](https://www.st.com/en/motor-drivers/powerstep01.html) which provide most of functionalities as a stepper driver.
 
 Friend of STEP400 : [STEP800](https://github.com/ponoor/STEP800)
+
+## Store
+https://ponoor.com/en/shop/
+
 ## Documentation
 https://ponoor.com/en/docs/step-series/
 
