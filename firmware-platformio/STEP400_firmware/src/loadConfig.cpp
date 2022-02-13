@@ -20,7 +20,7 @@ void loadConfig() {
     if (error) {
         p("Failed to read file: %s\nUsing default configuration.\n", error.f_str());
     }
-    configFileParseSucceeded = (error == false);
+    configFileParseSucceeded = !error;
     file.close();
     SD.end();
 
