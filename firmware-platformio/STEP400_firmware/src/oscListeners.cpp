@@ -1176,10 +1176,11 @@ void setHoldKval(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     uint8_t kvalInput = constrain(getInt(msg, 1), 0, 255);
     if(isCorrectMotorId(motorID)) {
-        if (!isCurrentMode[motorID]) {
-            stepper[motorID - MOTOR_ID_FIRST].setHoldKVAL(kvalInput);
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        if (!isCurrentMode[motorId]) {
+            stepper[motorId].setHoldKVAL(kvalInput);
         }
-        kvalHold[motorID - MOTOR_ID_FIRST] = kvalInput;
+        kvalHold[motorId] = kvalInput;
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -1195,10 +1196,11 @@ void setRunKval(OSCMessage& msg, int addrOffset) {
     uint8_t kvalInput = constrain(getInt(msg, 1), 0, 255);
 
     if(isCorrectMotorId(motorID)) {
-        if (!isCurrentMode[motorID]) {
-            stepper[motorID - MOTOR_ID_FIRST].setRunKVAL(kvalInput);
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        if (!isCurrentMode[motorId]) {
+            stepper[motorId].setRunKVAL(kvalInput);
         }
-        kvalRun[motorID - MOTOR_ID_FIRST] = kvalInput;
+        kvalRun[motorId] = kvalInput;
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -1213,10 +1215,11 @@ void setAccKval(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     uint8_t kvalInput = constrain(getInt(msg, 1), 0, 255);
     if(isCorrectMotorId(motorID)) {
-        if (!isCurrentMode[motorID]) {
-            stepper[motorID - MOTOR_ID_FIRST].setAccKVAL(kvalInput);
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        if (!isCurrentMode[motorId]) {
+            stepper[motorId].setAccKVAL(kvalInput);
         }
-        kvalAcc[motorID - MOTOR_ID_FIRST] = kvalInput;
+        kvalAcc[motorId] = kvalInput;
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -1231,10 +1234,11 @@ void setDecKval(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     uint8_t kvalInput = constrain(getInt(msg, 1), 0, 255);
     if(isCorrectMotorId(motorID)) {
-        if (!isCurrentMode[motorID]) {
-            stepper[motorID - MOTOR_ID_FIRST].setDecKVAL(kvalInput);
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        if (!isCurrentMode[motorId]) {
+            stepper[motorId].setDecKVAL(kvalInput);
         }
-        kvalDec[motorID - MOTOR_ID_FIRST] = kvalInput;
+        kvalDec[motorId] = kvalInput;
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
@@ -2041,44 +2045,60 @@ void resetPos(OSCMessage& msg, int addrOffset) {
         }
     }
 }
-void softStop(OSCMessage& msg, int addrOffset) {
+
+void softStop(OSCMessage &msg, int addrOffset)
+{
     uint8_t motorID = getInt(msg, 0);
-    if(isCorrectMotorId(motorID)) {
-        isServoMode[motorID - MOTOR_ID_FIRST] = false;
-        stepper[motorID - MOTOR_ID_FIRST].softStop();
+    if (isCorrectMotorId(motorID))
+    {
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        isServoMode[motorId] = false;
+        clearHomingStatus(motorId);
+        stepper[motorId].softStop();
     }
-    else if (motorID == MOTOR_ID_ALL) {
-        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+    else if (motorID == MOTOR_ID_ALL)
+    {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+        {
             isServoMode[i] = false;
+            clearHomingStatus(i);
             stepper[i].softStop();
         }
     }
 }
-void hardStop(OSCMessage& msg, int addrOffset) {
+void hardStop(OSCMessage &msg, int addrOffset)
+{
     uint8_t motorID = getInt(msg, 0);
-    if(isCorrectMotorId(motorID)) {
-        isServoMode[motorID - MOTOR_ID_FIRST] = false;
-        stepper[motorID - MOTOR_ID_FIRST].hardStop();
+    if (isCorrectMotorId(motorID))
+    {
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        isServoMode[motorId] = false;
+        clearHomingStatus(motorId);
+        stepper[motorId].hardStop();
     }
-    else if (motorID == MOTOR_ID_ALL) {
-        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
+    else if (motorID == MOTOR_ID_ALL)
+    {
+        for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+        {
             isServoMode[i] = false;
+            clearHomingStatus(i);
             stepper[i].hardStop();
         }
     }
 }
 
-void softHiZ(uint8_t motorID) {
-    isServoMode[motorID] = false;
-    if (electromagnetBrakeEnable[motorID]) {
-        if (motorStatus[motorID] == 0) { // motor stopped
-            activate(motorID, false);
+void softHiZ(uint8_t motorId) {
+    isServoMode[motorId] = false;
+    clearHomingStatus(motorId);
+    if (electromagnetBrakeEnable[motorId]) {
+        if (motorStatus[motorId] == 0) { // motor stopped
+            activate(motorId, false);
         } else {
-            stepper[motorID].softStop();
-            bBrakeDecWaiting[motorID] = true;
+            stepper[motorId].softStop();
+            bBrakeDecWaiting[motorId] = true;
         }
     } else {
-        stepper[motorID].softHiZ();
+        stepper[motorId].softHiZ();
     }
 }
 void softHiZ(OSCMessage& msg, int addrOffset) {
@@ -2096,17 +2116,19 @@ void softHiZ(OSCMessage& msg, int addrOffset) {
 void hardHiZ(OSCMessage& msg, int addrOffset) {
     uint8_t motorID = getInt(msg, 0);
     if(isCorrectMotorId(motorID)) {
-        motorID -= MOTOR_ID_FIRST;
-        isServoMode[motorID] = false;
-        if (electromagnetBrakeEnable[motorID]) {
-            activate(motorID, false);
+        uint8_t motorId = motorID - MOTOR_ID_FIRST;
+        isServoMode[motorId] = false;
+        clearHomingStatus(motorId);
+        if (electromagnetBrakeEnable[motorId]) {
+            activate(motorId, false);
         } else {
-            stepper[motorID].hardHiZ();
+            stepper[motorId].hardHiZ();
         }
     }
     else if (motorID == MOTOR_ID_ALL) {
         for (uint8_t i = 0; i < NUM_OF_MOTOR; i++) {
             isServoMode[i] = false;
+            clearHomingStatus(i);
             if (electromagnetBrakeEnable[i]) {
               activate(i, false);
             } else {
@@ -2145,6 +2167,8 @@ void activate(uint8_t motorId, bool state) {
                 digitalWrite(brakePin[motorId], LOW);
                 #endif
                 brakeStatus[motorId] = BRAKE_MOTORHIZ_WAITING;
+                isServoMode[motorId] = false;
+                clearHomingStatus(motorId);
                 brakeTransitionTrigTime[motorId] = millis();
             }    
         }
@@ -2172,6 +2196,8 @@ void free(uint8_t motorId) {
         #endif
         stepper[motorId].hardHiZ();
         brakeStatus[motorId] = BRAKE_DISENGAGED;
+        isServoMode[motorId] = false;
+        clearHomingStatus(motorId);
     } else {
         sendCommandError(motorId + MOTOR_ID_FIRST, ERROR_COMMAND_IGNORED);
     }
@@ -2218,6 +2244,7 @@ void enableServoMode(uint8_t motorId, bool enable) {
         reportMotorStatus[motorId] = false;
         reportDir[motorId] = false;
         stepper[motorId].hardStop();
+        clearHomingStatus(motorId);
     }
     else {
         stepper[motorId].softStop();
