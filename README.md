@@ -21,6 +21,8 @@ These 2 folders contain same codes.
 - [/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/STEP400_firmware) : Arduino Sketch folder
 - [/firmware-platformio/STEP400_firmware](https://github.com/ponoor/STEP400/tree/master/firmware-platformio/STEP400_firmware) : PlatformIO folder
 
+Note: We are working on the "[Universal Firmware](https://github.com/ponoor/step-series-universal-firmware)" which covers all STEP series board. A development of each firmware (above) will be terminated soon.
+
 ### Hardware
 [/hardware](https://github.com/ponoor/STEP400/tree/master/hardware) : Eagle design files, BOM lists, and schematics PDFs
 
