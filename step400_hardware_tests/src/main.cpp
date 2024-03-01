@@ -1,3 +1,7 @@
+// Arduino Sketch for STEP400 Hardware Inspections
+// target : STEP400 / Arduino Zero Native USB port
+// by Kanta HORIO / Ponoor Experiments inc
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <Ethernet.h>
@@ -8,7 +12,7 @@
 
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
-constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.0.0";
+constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.1.0";
 
 String results;
 FlashStorage(storage, String);
@@ -25,7 +29,7 @@ const uint8_t auxPin[3] = { SCL,SDA,38u };
 #define POWERSTEP_MISO  6u  // D6 /SERCOM3/PAD[2] miso
 #define POWERSTEP_MOSI  11u // D11/SERCOM3/PAD[0] mosi
 #define POWERSTEP_SCK 12u // D12/SERCOM3/PAD[3] sck
-SPIClass powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins
+SPIClassSAMD powerStepSPI(&sercom3, POWERSTEP_MISO, POWERSTEP_SCK, POWERSTEP_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);// MISO/SCK/MOSI pins
 
 #define POWERSTEP_CS_PIN A0
 #define POWERSTEP_RESET_PIN A2
@@ -385,6 +389,64 @@ bool dipSwTest() {
   return result;
 }
 
+// LED (MCU and motor drivers)
+bool ledTest()
+{
+  uint8_t inByte = 0;
+  showHeader("LEDs");
+  p("FLAG LEDs test. Check 8 red LEDs (next to the motor driver chips) are on.\n");
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardStop();
+    stepper[i].setParam(INT_SPD, 0); // this should cause an NOTPREF_CMD flag.
+  }
+  p("type any key to the next test.\n");
+  while (SerialUSB.available() == 0)
+  {
+    ;
+  }
+  inByte = SerialUSB.read();
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardHiZ();
+    stepper[i].getStatus();
+  }
+
+  p("BUSY LEDs test. Check 8 green LEDs (next to the motor driver chips) are on.\n");
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].getStatus();            // clear the busy flags
+    stepper[i].goUntil(0, FWD, 100.0f); // make the driver busy
+  }
+  p("type any key to the next test.\n");
+  while (SerialUSB.available() == 0)
+  {
+    ;
+  }
+  inByte = SerialUSB.read();
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardHiZ();
+    stepper[i].getStatus();
+  }
+  p("L, TX, RX LEDs test. Check 3 LEDs next to the Ethernet connectors are blinking.\n");
+  p("type any key to the next test.\n");
+
+  while (SerialUSB.available() == 0)
+  {
+    digitalWrite(PIN_LED_RXL, HIGH);
+    digitalWrite(PIN_LED_TXL, HIGH);
+    digitalWrite(ledPin, HIGH);
+    delay(30);
+    digitalWrite(PIN_LED_RXL, LOW);
+    digitalWrite(PIN_LED_TXL, LOW);
+    digitalWrite(ledPin, LOW);
+    delay(30);
+  }
+  inByte = SerialUSB.read();
+  return true;
+}
+
 void setup() {
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
@@ -402,6 +464,7 @@ void hardwareTest() {
   t &= (testResult[2] = auxPinTest());
   t &= (testResult[3] = ethernetTest());
   t &= (testResult[4] = powerSTEP01Test());
+  ledTest();
   t &= (testResult[5] = dipSwTest());
   showHeader("Result of Hardware Test");
   p("SD Card: ");
