@@ -269,12 +269,19 @@ bool powerSTEP01Test() {
   p("PowerSTEP01 SPI connection: ");
   for (i = 0; i < NUM_OF_MOTOR; i++) {
     stepper[i].resetDev();
-    stepper[i].setOscMode(EXT_24MHZ_OSCOUT_INVERT); // 16MHz for the production version
+    stepper[i].hardHiZ();
+    stepper[i].setSwitchMode(SW_USER);
+    stepper[i].setOscMode(EXT_16MHZ_OSCOUT_INVERT); // 16MHz for the production version
+    stepper[i].setOCShutdown(OC_SD_DISABLE);
     stepper[i].setVoltageComp(VS_COMP_DISABLE);
     stepper[i].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
+    stepper[i].setParam(STALL_TH, 0x1F);
+    // stepper[i].setParam(OCD_TH, 0x1F);
     status[i] = stepper[i].getStatus(); // Clear Startup Flags
+    stepper[i].run(FWD, 200.0); // to collect the status
     status[i] = stepper[i].getStatus();
     temp += status[i];
+    stepper[i].hardHiZ(); // then stop the motor.
   }
   showBoolResult(temp!=0);
 
@@ -298,17 +305,17 @@ bool powerSTEP01Test() {
         break;
       case 1:
         // OCD detected.
-        p("OCD(Over Current) detected.\n");
+        p("Failed, OCD(Over Current) detected.\n");
         result = false;
         break;
       case 2:
         // ULVO detected.
-        p("UVLO(Under Voltage LockOut) detected.\n");
+        p("Failed, UVLO(Under Voltage LockOut) detected.\n");
         result = false;
         break;
       case 3:
         // OCD+ULVO detected.
-        p("OCD+UVLO detected.\n");
+        p("Failed, OCD+UVLO detected.\n");
         result = false;
         break;
       default:
@@ -320,26 +327,97 @@ bool powerSTEP01Test() {
       p(" SW_F: %d ", swF);
       showBoolResult(!swF);
       if (swF == 1) {
-        p("HOME senser input closed. Check HOME connection.\n");
+        p("Failed, HOME senser input closed. Check HOME connection.\n");
         result = false;
       }
       // ADC
       temp = stepper[i].getParam(ADC_OUT);
       p(" ADC_OUT: %d ", temp);
       if (temp < 25) {
-        p("Unexpected value. Check ADC_OUT pin connection.\n");
+        p("Failed, Unexpected value. Check ADC_OUT pin connection.\n");
         result = false;
       }
       else {
         p("Ok\n");
       }
+      // BUSY
+      bool busyF = (status[i] & STATUS_BUSY);
+      p(" BUSY: %d ", busyF); // 1:NOT BUSY, 0:BUSY, should be in BUSY
+      showBoolResult(!busyF);
+      if (busyF == 1)
+      {
+        p("  The test motor motion command can't execute.\n");
+        result = false;
+      }
     }
   } else {
     result = false;
   }
-  powerStepSPI.end();
+  // powerStepSPI.end(); // Keep SPI active for the upcoming LED tests.
   showTestResult(result);
   return result;
+}
+
+// LED (MCU and motor drivers)
+bool ledTest()
+{
+  uint8_t inByte = 0;
+  showHeader("LEDs");
+  p("FLAG LEDs test. Check 4 red LEDs (next to the motor connectors) are on.\n");
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardStop();
+    stepper[i].setParam(INT_SPD, 0); // this should cause an NOTPREF_CMD flag.
+  }
+  p("type any key to the next test.\n");
+  while (SerialUSB.available() == 0)
+  {
+    ;
+  }
+  inByte = SerialUSB.read();
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardHiZ();
+    stepper[i].getStatus();
+  }
+
+  p("BUSY LEDs test. Check 4 green LEDs (next to the motor connectors) are on.\n");
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    
+    int t = stepper[i].getStatus();            // clear the busy flags
+    p("\tSTATUS:%d",t);
+    stepper[i].goUntil(0, FWD, 100.0f); // make the driver busy
+    t = stepper[i].getStatus();            // clear the busy flags
+    p(", %d\n",t);
+  }
+  p("type any key to the next test.\n");
+  while (SerialUSB.available() == 0)
+  {
+    ;
+  }
+  inByte = SerialUSB.read();
+  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  {
+    stepper[i].hardHiZ();
+    stepper[i].getStatus();
+  }
+  p("L, TX, RX LEDs test. Check 3 LEDs next to the Ethernet connectors are blinking.\n");
+  p("type any key to the next test.\n");
+
+  while (SerialUSB.available() == 0)
+  {
+    digitalWrite(PIN_LED_RXL, HIGH);
+    digitalWrite(PIN_LED_TXL, HIGH);
+    digitalWrite(ledPin, HIGH);
+    delay(30);
+    digitalWrite(PIN_LED_RXL, LOW);
+    digitalWrite(PIN_LED_TXL, LOW);
+    digitalWrite(ledPin, LOW);
+    delay(30);
+  }
+  inByte = SerialUSB.read();
+  return true;
 }
 
 // DIP switch
@@ -387,64 +465,6 @@ bool dipSwTest() {
 
   showTestResult(result);
   return result;
-}
-
-// LED (MCU and motor drivers)
-bool ledTest()
-{
-  uint8_t inByte = 0;
-  showHeader("LEDs");
-  p("FLAG LEDs test. Check 8 red LEDs (next to the motor driver chips) are on.\n");
-  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
-  {
-    stepper[i].hardStop();
-    stepper[i].setParam(INT_SPD, 0); // this should cause an NOTPREF_CMD flag.
-  }
-  p("type any key to the next test.\n");
-  while (SerialUSB.available() == 0)
-  {
-    ;
-  }
-  inByte = SerialUSB.read();
-  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
-  {
-    stepper[i].hardHiZ();
-    stepper[i].getStatus();
-  }
-
-  p("BUSY LEDs test. Check 8 green LEDs (next to the motor driver chips) are on.\n");
-  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
-  {
-    stepper[i].getStatus();            // clear the busy flags
-    stepper[i].goUntil(0, FWD, 100.0f); // make the driver busy
-  }
-  p("type any key to the next test.\n");
-  while (SerialUSB.available() == 0)
-  {
-    ;
-  }
-  inByte = SerialUSB.read();
-  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
-  {
-    stepper[i].hardHiZ();
-    stepper[i].getStatus();
-  }
-  p("L, TX, RX LEDs test. Check 3 LEDs next to the Ethernet connectors are blinking.\n");
-  p("type any key to the next test.\n");
-
-  while (SerialUSB.available() == 0)
-  {
-    digitalWrite(PIN_LED_RXL, HIGH);
-    digitalWrite(PIN_LED_TXL, HIGH);
-    digitalWrite(ledPin, HIGH);
-    delay(30);
-    digitalWrite(PIN_LED_RXL, LOW);
-    digitalWrite(PIN_LED_TXL, LOW);
-    digitalWrite(ledPin, LOW);
-    delay(30);
-  }
-  inByte = SerialUSB.read();
-  return true;
 }
 
 void setup() {
