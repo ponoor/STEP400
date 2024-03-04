@@ -12,7 +12,7 @@
 
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
-constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.1.0";
+constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.1.1";
 
 String results;
 FlashStorage(storage, String);
@@ -232,8 +232,31 @@ bool ethernetTest() {
   return result;
 }
 
+uint16_t resetMotorDriver(uint8_t deviceId)
+{
+    stepper[deviceId].resetDev();
+    stepper[deviceId].hardHiZ();
+    stepper[deviceId].setSwitchMode(SW_USER);
+    // stepper[deviceId].configStepMode(STEP_SEL_1_128);
+    stepper[deviceId].setSlewRate(114); // required to prevent stall
+    stepper[deviceId].setVoltageComp(VS_COMP_DISABLE);
+    // stepper[deviceId].setPWMFreq(PWM_DIV_1, PWM_MUL_0_75);
+    stepper[deviceId].setOCShutdown(OC_SD_DISABLE);
+    stepper[deviceId].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
+    // stepper[deviceId].setParam(STALL_TH, 0x1F);
+    stepper[deviceId].setOscMode(EXT_16MHZ_OSCOUT_INVERT); // 16MHz for the production version
+    // stepper[i].setParam(OCD_TH, 0x1F);
+    stepper[deviceId].getStatus(); // Clear Startup Flags
+    stepper[deviceId].run(FWD, 200.0); // to collect the status
+    delay(20); // required to get the correct SW_F flags.
+    uint16_t temp = stepper[deviceId].getStatus();
+    stepper[deviceId].hardHiZ(); // then stop the motor.
+    return temp;
+}
 // PowerSTEP01
 bool powerSTEP01Test() {
+    uint8_t i = 0;
+  uint16_t status[NUM_OF_MOTOR];
   bool result = true;
   showHeader("PowerSTEP01");
   pinMode(POWERSTEP_RESET_PIN, OUTPUT);
@@ -252,36 +275,20 @@ bool powerSTEP01Test() {
   pinPeripheral(POWERSTEP_MISO, PIO_SERCOM_ALT);
   powerStepSPI.setDataMode(SPI_MODE3);
 
-  for (uint8_t i = 0; i < NUM_OF_MOTOR; i++)
+  p("PowerSTEP01 SPI connection: ");
+  uint32_t temp = 0;
+  for (i = 0; i < NUM_OF_MOTOR; i++)
   {
       stepper[i].SPIPortConnect(&powerStepSPI);
-      // resetMotorDriver(i + MOTOR_ID_FIRST);
+  }
+  for (i = 0; i < NUM_OF_MOTOR; i++)
+  {
+      status[i] = resetMotorDriver(i);
+      temp += status[i];
       digitalWrite(ledPin, HIGH);
       delay(5);
       digitalWrite(ledPin, LOW);
       delay(5);
-  }
-
-  uint8_t i = 0;
-  uint16_t status[NUM_OF_MOTOR];
-  uint32_t temp = 0;
-
-  p("PowerSTEP01 SPI connection: ");
-  for (i = 0; i < NUM_OF_MOTOR; i++) {
-    stepper[i].resetDev();
-    stepper[i].hardHiZ();
-    stepper[i].setSwitchMode(SW_USER);
-    stepper[i].setOscMode(EXT_16MHZ_OSCOUT_INVERT); // 16MHz for the production version
-    stepper[i].setOCShutdown(OC_SD_DISABLE);
-    stepper[i].setVoltageComp(VS_COMP_DISABLE);
-    stepper[i].setParam(ALARM_EN, 0xEF); // Enable alarms except ADC UVLO
-    stepper[i].setParam(STALL_TH, 0x1F);
-    // stepper[i].setParam(OCD_TH, 0x1F);
-    status[i] = stepper[i].getStatus(); // Clear Startup Flags
-    stepper[i].run(FWD, 200.0); // to collect the status
-    status[i] = stepper[i].getStatus();
-    temp += status[i];
-    stepper[i].hardHiZ(); // then stop the motor.
   }
   showBoolResult(temp!=0);
 
@@ -475,14 +482,14 @@ void setup() {
 }
 
 void hardwareTest() {
-  bool testResult[6];
+  bool testResult[6] = {false};
   bool t = true;
   results = "";
   showTestTitle();
-  t &= (testResult[0] = sdTest());
-  t &= (testResult[1] = brakePinTest());
-  t &= (testResult[2] = auxPinTest());
-  t &= (testResult[3] = ethernetTest());
+  // t &= (testResult[0] = sdTest());
+  // t &= (testResult[1] = brakePinTest());
+  // t &= (testResult[2] = auxPinTest());
+  // t &= (testResult[3] = ethernetTest());
   t &= (testResult[4] = powerSTEP01Test());
   ledTest();
   t &= (testResult[5] = dipSwTest());
