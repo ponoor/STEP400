@@ -12,7 +12,7 @@
 
 #define COMPILE_DATE __DATE__
 #define COMPILE_TIME __TIME__
-constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.1.1";
+constexpr auto FIRMWARE_NAME = "STEP400_r1_hardware_test_r1.1.2";
 
 String results;
 FlashStorage(storage, String);
@@ -248,7 +248,7 @@ uint16_t resetMotorDriver(uint8_t deviceId)
     // stepper[i].setParam(OCD_TH, 0x1F);
     stepper[deviceId].getStatus(); // Clear Startup Flags
     stepper[deviceId].run(FWD, 200.0); // to collect the status
-    delay(20); // required to get the correct SW_F flags.
+    delay(30); // required to get the correct SW_F flags.
     uint16_t temp = stepper[deviceId].getStatus();
     stepper[deviceId].hardHiZ(); // then stop the motor.
     return temp;
@@ -486,10 +486,10 @@ void hardwareTest() {
   bool t = true;
   results = "";
   showTestTitle();
-  // t &= (testResult[0] = sdTest());
-  // t &= (testResult[1] = brakePinTest());
-  // t &= (testResult[2] = auxPinTest());
-  // t &= (testResult[3] = ethernetTest());
+  t &= (testResult[0] = sdTest());
+  t &= (testResult[1] = brakePinTest());
+  t &= (testResult[2] = auxPinTest());
+  t &= (testResult[3] = ethernetTest());
   t &= (testResult[4] = powerSTEP01Test());
   ledTest();
   t &= (testResult[5] = dipSwTest());
