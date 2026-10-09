@@ -22,7 +22,15 @@ The board is controlled with [Open Sound Control](https://opensoundcontrol.stanf
 
 STEP400 is part of the STEP series. Its sibling, [STEP800](https://github.com/ponoor/STEP800), drives eight smaller motors with L6470 drivers and shares the same firmware and OSC commands.
 
+Friend of STEP400 : [STEP800](https://github.com/ponoor/STEP800)
+
+## Store
+https://ponoor.com/en/shop/
+
 ## Documentation
+https://ponoor.com/en/docs/step-series/
+
+Forum: https://github.com/ponoor/step-series-support/discussions
 
 - **[STEP400/STEP800 documentation](https://ponoor.com/en/docs/step-series/)** ([日本語](https://ponoor.com/docs/step-series/))
   - [Tutorial](https://ponoor.com/en/docs/step-series/tutorial/)
