@@ -51,3 +51,10 @@ STEP400_firmware/Release/board.buildinfo
 *.opendb
 *.ipch
 *.code-workspace
+
+# KiCad
+*.lck
+.history/
+*-backups/
+fp-info-cache
+*.kicad_prl
